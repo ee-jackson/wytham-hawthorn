@@ -15,6 +15,7 @@ knitr::opts_chunk$set(fig.path = "figures/2021-05-28_create-map/")
 library("tidyverse")
 library("mapview")
 library("sp")
+library("ggmap")
 ```
 
 ## Read in gpx file and clean up
@@ -27,15 +28,27 @@ plotKML::readGPX(here::here("data", "raw", "waypoints.gpx")) %>%
                           sym == "Flag, Blue" ~ "Crataegus_laevigata")) -> waypoints
 ```
 
-## Make the data a spatial df object and use `mapview` to make a quick interactive map
+## Make a static map
+
+```{r}
+bbox <- make_bbox(c(min(waypoints$lon), max(waypoints$lon)), 
+                  c(min(waypoints$lat), max(waypoints$lat)))
+
+ggmap(get_map(bbox, source = "osm", messaging = FALSE))+
+  geom_point(data = waypoints, 
+           aes(lon, lat, colour = taxa))
+```
+
+## Use `mapview` to make a quick interactive map
 
 ```{r make-map}
-#coordinates
-coordinates(waypoints) <- ~ lon + lat
-
-#projection
-proj4string(waypoints) <- "+init=epsg:4326"
+# make the data a spatial df object 
+SpatialPointsDataFrame(coords = select(waypoints, lon, lat), 
+                       data = waypoints, 
+                       proj4string = CRS("+init=epsg:4326")) -> waypoints_sp
 
 # make map
-mapview(waypoints, zcol = "taxa", label = "id")
+mapview(waypoints_sp, zcol = "taxa", label = "id")
+
+# will not render when knitted - pandoc problem?
 ```
