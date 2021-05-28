@@ -1,0 +1,11 @@
+---
+title: "Explore"
+author: "Eleanor Jackson"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output: 
+  github_document:
+    keep_html: true
+---
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(fig.path="figures/yyy-mm-dd_explore/")
+```
