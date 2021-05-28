@@ -1,0 +1,41 @@
+---
+title: "Make an interactive map of focal trees"
+author: "Eleanor Jackson"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+always_allow_html: true
+output: 
+  github_document:
+    keep_html: true
+---
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(fig.path = "figures/2021-05-28_create-map/")
+```
+
+```{r packages}
+library("tidyverse")
+library("mapview")
+library("sp")
+```
+
+## Read in gpx file and clean up
+
+```{r read-gpx}
+plotKML::readGPX(here::here("data", "raw", "waypoints.gpx")) %>%
+  map_df(~.) %>%
+  rename(id = name) %>%
+  mutate(taxa = case_when(sym == "Park" ~ "Prunus_spinosa",
+                          sym == "Flag, Blue" ~ "Crataegus_laevigata")) -> waypoints
+```
+
+## Make the data a spatial df object and use `mapview` to make a quick interactive map
+
+```{r make-map}
+#coordinates
+coordinates(waypoints) <- ~ lon + lat
+
+#projection
+proj4string(waypoints) <- "+init=epsg:4326"
+
+# make map
+mapview(waypoints, zcol = "taxa", label = "id")
+```
