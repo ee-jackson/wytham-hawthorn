@@ -13,9 +13,10 @@ knitr::opts_chunk$set(fig.path = "figures/2021-05-28_create-map/")
 
 ```{r packages}
 library("tidyverse")
-library("mapview")
 library("sp")
 library("ggmap")
+library("geojsonio")
+library("leaflet")
 ```
 
 ## Read in gpx file and clean up
@@ -30,25 +31,40 @@ plotKML::readGPX(here::here("data", "raw", "waypoints.gpx")) %>%
 
 ## Make a static map
 
-```{r}
+```{r ggmap}
 bbox <- make_bbox(c(min(waypoints$lon), max(waypoints$lon)), 
                   c(min(waypoints$lat), max(waypoints$lat)))
 
-ggmap(get_map(bbox, source = "osm", messaging = FALSE))+
+ggmap(get_map(bbox, source = "osm", messaging = FALSE)) +
   geom_point(data = waypoints, 
            aes(lon, lat, colour = taxa))
+
+# not very detailed
 ```
 
-## Use `mapview` to make a quick interactive map
-
-```{r make-map}
+```{r make-sp}
 # make the data a spatial df object 
 SpatialPointsDataFrame(coords = select(waypoints, lon, lat), 
                        data = waypoints, 
                        proj4string = CRS("+init=epsg:4326")) -> waypoints_sp
-
-# make map
-mapview(waypoints_sp, zcol = "taxa", label = "id")
-
-# will not render when knitted - pandoc problem?
 ```
+
+## Make an interactive map
+
+```{r leaflet-map}
+# colours
+pal <- colorFactor(c("navy", "red"), c("Prunus_spinosa", "Crataegus_laevigata"))
+
+# make a map with leaflet
+leaflet(data = waypoints_sp)%>% 
+  addCircleMarkers(label = ~id, color = ~pal(taxa), 
+                            fillOpacity = 0.8, stroke = FALSE, radius = 5) %>% 
+  addTiles() %>%
+  addLegend(pal = pal, values = ~taxa)
+
+# export as geojson
+waypoints_geojson <- geojson_json(waypoints_sp)
+geojson_write(waypoints_geojson, file = "focal-trees-map.geojson")
+```
+
+<script src="https://embed.github.com/view/geojson/ee-jackson/wytham-seed-predation/main/code/exploration/focal-trees-map.geojson"></script>
