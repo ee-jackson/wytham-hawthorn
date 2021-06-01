@@ -62,9 +62,9 @@ leaflet(data = waypoints_sp)%>%
   addTiles() %>%
   addLegend(pal = pal, values = ~taxa)
 
-# export as geojson
+# export sp object as geojson
 waypoints_geojson <- geojson_json(waypoints_sp)
 geojson_write(waypoints_geojson, file = "focal-trees-map.geojson")
 ```
 
-<script src="https://embed.github.com/view/geojson/ee-jackson/wytham-seed-predation/main/code/exploration/focal-trees-map.geojson"></script>
+[View the interactive version here](focal-trees-map.geojson)

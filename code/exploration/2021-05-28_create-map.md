@@ -113,7 +113,7 @@ leaflet(data = waypoints_sp)%>%
 ![](figures/2021-05-28_create-map/leaflet-map-1.png)<!-- -->
 
 ``` r
-# export as geojson
+# export sp object as geojson
 waypoints_geojson <- geojson_json(waypoints_sp)
 geojson_write(waypoints_geojson, file = "focal-trees-map.geojson")
 ```
@@ -124,4 +124,4 @@ geojson_write(waypoints_geojson, file = "focal-trees-map.geojson")
     ##   Path:       focal-trees-map.geojson
     ##   From class: json
 
-<script src="https://embed.github.com/view/geojson/ee-jackson/wytham-seed-predation/main/code/exploration/focal-trees-map.geojson"></script>
+[View the interactive version here](focal-trees-map.geojson)
