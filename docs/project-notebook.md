@@ -1,8 +1,19 @@
 # project-notebook
 
+## 2021-06-08 Tuesday
+### Meeting: SG & EJ
+* Aim to have ethanol filled vials ready in the next 2 weeks
+  * SG emailed Yves Basset who reccomended 95% ethanol
+  * EJ to email Soon Gweon about lab space and equipment for ethanol dilution
+* Will start collecting fruits at Wytham opportunistically
+  * set limits, e.g. one day every 2 weeks, max 50 seeds from an individual and max 5 individuals per sp per sampling date
+  * collect fruits in sandwich bags
+  * fruits from one individual can go in the same bag
+  * record gps coordinates, pre-dispersal or post-dispersal, size/developmental stage of fruits (could take a photo of fruit next to a ruler)
+
 ## 2021-05-26 Tuesday
 ### EJ & SG at Wytham
-* found and mapped, and re-tagged trees 002, 003, 004, 012, 014 & 017. We now have all the focal blackthorn on the GPS
+* found, mapped, and re-tagged trees 002, 003, 004, 012, 014 & 017. We now have all the focal blackthorn on the GPS
 * found and mapped blackthorn 026 - a new one
 * did not re-tag 012 with a pink label as terrain was very difficult. Will probably discard this one
 * started mapping & tagging some hawthorn: 001H, 003H, 026H, 017H, 002H, 004H, 012H
