@@ -1,7 +1,7 @@
 Make a map of focal trees
 ================
 Eleanor Jackson
-02 June, 2021
+23 August, 2021
 
 ``` r
 library("tidyverse")
@@ -21,7 +21,8 @@ plotKML::readGPX(here::here("data", "raw", "waypoints.gpx")) %>%
   rename(id = name) %>%
   mutate(taxa = case_when(sym == "Park" ~ "Prunus_spinosa",
                           sym == "Flag, Blue" ~ "Crataegus_laevigata")) %>%
-  select(-sym) -> waypoints
+  select(-sym) %>%
+  arrange(id) -> waypoints
 ```
 
 ## Make a static map
