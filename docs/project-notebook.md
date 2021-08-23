@@ -1,9 +1,58 @@
 # project-notebook
 
+## 2021-08-06 Friday
+### EJ at Wytham
+* Second day counting fruits
+  * visited trees in the Eastern part of the woods which I did not reach yesterday
+
+## 2021-08-05 Thursday
+### EJ at Wytham
+* First day counting fruits
+  * tried to visit all focal trees in one day but was unsuccessful
+  * might be quicker the next time around as I won't need to chose branches
+  * large variation in the amount of fruit on each tree, the sample size for some will be small
+
+## 2021-08-02 Monday
+### EJ at Wytham
+* mapped more hawthorn
+  * Walked the eastern trails - Pasticks and Marley wood
+
+## 2021-07-29 Thursday
+### EJ at Wytham
+* mapped more hawthorn
+  * Covered trails in the southern area of the woods - Rough Copse, Guy's Copse, Songers Copse, Radbrook Common
+
+## 2021-07-27 Tuesday
+### EJ at Wytham
+* mapped more hawthorn
+  * Covered trails around Wytham Hill and Woodcroft Copse
+
+## 2021-07-20 Tuesday
+### EJ at Wytham
+* started mapping hawthorn
+  * many hawthorn also did not produce fruit, however as they are so common it should still be possible to get a good sample size
+  * covered all trails in the Great Wood, north of Lord's Common and tagged trees with fruits close to the trail
+  * only found four but I think they are rarer in this part of the woods
+  * some fruits were turning red but did not look ripe - still small and hard. Found on branches and on the ground under trees
+* discussing with SG: how can we distinguish between missing fruits which have dispersed and missing fruits which have dropped prematurely? Fruits look like they're maturing at different rates, even on the same branch
+  * netting that is big enough for insects to get through but small enough to trap fruits?
+* Reading https://doi.org/10.1111/1365-2745.13554
+  * Lit says that hawthorn have very little variability in fruiting between years and no evidence of masting. Why then have so many not fruited? Too young (can take between 5 and 8 years till first fruit)? Adverse weather over the past year? They are not very shade tolerant - is it too shady in the woods to produce fruit on the lower branches?
+* Fruit should ripen from August through to September and remain on the trees through to at least December
+
+## 2021-07-15 Thursday
+### EJ at Wytham
+* visited 20 focal blackthorn with the intention of beginning fruit counting/monitoring. Of the 20 trees visited, 
+  * 4 have become inaccessible due to large ferns/brambles/nettle 
+  * 8 had no fruit
+  * individuals which did have fruits had very few, approx 10 per branch
+* Will try to switch to Hawthorn as focal species as they had many more fruits
+  * next week start mapping out focal individuals, aim for ~ 40
+
 ## 2021-06-08 Tuesday
 ### Meeting: SG & EJ
 * Aim to have ethanol filled vials ready in the next 2 weeks
-  * SG emailed Yves Basset who reccomended 95% ethanol
+  * SG emailed Yves Basset who recommended 95% ethanol
   * EJ to email Soon Gweon about lab space and equipment for ethanol dilution
 * Will start collecting fruits at Wytham opportunistically
   * set limits, e.g. one day every 2 weeks, max 50 seeds from an individual and max 5 individuals per sp per sampling date
