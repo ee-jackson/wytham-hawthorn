@@ -1,5 +1,19 @@
 # project-notebook
 
+## 2021-08-24 Tuesday
+### Meeting: SG & EJ
+* Can still consider rearing insects from focal trees - unmarked branches
+  * possible for trees which have a lot of fruit -predispersal or/and collect from the ground
+  * could compare insect abundance in pre and post dispersal fruits
+* Vertebrate exclusion
+  * could use something firm like chicken wire to create a cage around the branches e.g. Beckman & Muller-Landau 2011
+  * There might be a bird box hole size guide or something that we can use to inform choice of mesh size for the chicken wire
+  * Sorensen 1981 Wytham study suggests birds aren't feeding heavily on Hawthorn till October
+  * Get something in place before the end of September?
+* To do:
+  * explore vertebrate exclusion methods in the literature
+  * write up notes on questions to answer and analysis methods we might use
+
 ## 2021-08-06 Friday
 ### EJ at Wytham
 * Second day counting fruits
@@ -9,7 +23,7 @@
 ### EJ at Wytham
 * First day counting fruits
   * tried to visit all focal trees in one day but was unsuccessful
-  * might be quicker the next time around as I won't need to chose branches
+  * might be quicker the next time around as I won't need to choose branches
   * large variation in the amount of fruit on each tree, the sample size for some will be small
 
 ## 2021-08-02 Monday
@@ -68,7 +82,7 @@
 * started mapping & tagging some hawthorn: 001H, 003H, 026H, 017H, 002H, 004H, 012H
   * most mapped hawthorn were next to a focal blackthorn, but we also mapped some that were in areas of the woods for which we have no blackthorn - thinking that we will have a larger sample size of hawthorn than blackthorn
   * Hawthorn is in flower now but should be easy to find even when not in flower, so we weren't exhaustive in mapping
-* Think we should wait to start mapping Rosaceae around focals as some focal trees may not end up being suitable e.g. dont produce enough/any fruits
+* Think we should wait to start mapping Rosaceae around focals as some focal trees may not end up being suitable e.g. don't produce enough/any fruits
 
 ## 2021-05-18 Friday
 ### Meeting: SG & EJ
@@ -111,7 +125,7 @@ Thinking about finding Torymus varians:
 * Additionally, marked 3 branches on 6 focal trees and counted flowers (flowers are brown, stamen still visible, sometimes small green fruits)
   * tree ids: 001, 015, 005, 008, 007, 021
   * recorded number of flowers and distance from branch tip to label
-  * flowers inbetween branch tip and label were counted
+  * flowers between branch tip and label were counted
   * label was placed at a distance that gave around 30 flowers
 * was not able to count flowers on all re-marked trees as branches with flowers were either too high or not visible
   * 018 - branches were too high and really difficult to access
