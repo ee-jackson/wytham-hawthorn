@@ -1,5 +1,9 @@
 # project-notebook
 
+## 2021-09-02 Thursday
+### EJ at Wytham
+* Completed second survey of focal Hawthorn individuals
+
 ## 2021-08-24 Tuesday
 ### Meeting: SG & EJ
 * Can still consider rearing insects from focal trees - unmarked branches
