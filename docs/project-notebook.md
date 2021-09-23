@@ -1,5 +1,21 @@
 # project-notebook
 
+## 2021-10-17 Friday
+### Meeting: SG, EJ, JB & TO
+* Should we exclude vertebrates from all focal branches?
+  * could be interesting to look at bird dispersal but we would need more than 3 branches
+  * when we next go out we could label and count fruit on another 3 branches to compare to caged branches
+* How to measure Hawthorn density?
+  * belt transects
+  * get a dgps? - accurate to 2cm!
+* adjacent project for a MSc student looking at pollination limitation
+  * they could measure additional variables like canopy cover & altitude and conduct observations of visiting pollinators
+
+## 2021-09-13 Monday
+### EJ & SG at Wytham
+* Spent a full day collecting seeds and fruits for insect rearing
+* tested vertebrate exclusion cage around branches using chicken wire
+
 ## 2021-09-02 Thursday
 ### EJ at Wytham
 * Completed second survey of focal Hawthorn individuals
