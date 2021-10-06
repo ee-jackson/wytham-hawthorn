@@ -1,11 +1,11 @@
 # project-notebook
 
-## 2021-09-29 Monday
+## 2021-09-29 Wednesday
 ### EJ & SG at Wytham
 * finished adding wire mesh cages around Hawthorn branches
-* one of the focal individuals had been cut down
+* one of the focal trees had been cut down
 
-## 2021-09-28 Monday
+## 2021-09-28 Tuesday
 ### EJ & SG at Wytham
 * continued adding wire mesh cages around Hawthorn branches
 
@@ -14,7 +14,7 @@
 * started adding wire mesh cages around Hawthorn branches
   * cages around 3 branches and labelled and counted fruits on 3 extra branches per tree
 
-## 2021-10-17 Friday
+## 2021-09-17 Friday
 ### Meeting: SG, EJ, JB & TO
 * Should we exclude vertebrates from all focal branches?
   * could be interesting to look at bird dispersal but we would need more than 3 branches
