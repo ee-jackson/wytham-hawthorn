@@ -1,16 +1,57 @@
 # project-notebook
 
+## 2022-01-28 Friday
+### EJ at Wytham
+* 7th survey
+* tree 23 has been knocked down, was able to collect data from 2 branches that were still intact
+  * they are going to coppice it and hopefully it will grow back in the Spring
+* Also collected a small number of fruits (<100) from non-focal individuals for a pilot germination experiment
+  * was not able to collect many as there are not many fruits around
+
+## 2022-01-27 Thursday
+### EJ at Wytham
+* 7th survey
+
+## 2021-12-21 Tuesday
+### EJ at Wytham
+* 6th survey
+
+## 2021-12-20 Monday
+### EJ at Wytham
+* 6th survey
+
+## 2021-11-25 Thursday
+### EJ at Wytham
+* 5th survey
+
+## 2021-11-24 Wednesday
+### EJ at Wytham
+* 5th survey
+
+## 2021-10-29 Friday
+### EJ at Wytham
+* 4th survey
+* collected 100 fruits from each focal tree's nearest neighbour for insect rearing
+
+## 2021-10-28 Thursday
+### EJ at Wytham
+* 4th survey
+* collected 100 fruits from each focal tree's nearest neighbour for insect rearing
+
 ## 2021-09-29 Wednesday
 ### EJ & SG at Wytham
-* finished adding wire mesh cages around Hawthorn branches
+* 3rd survey
+* finished adding wire mesh cages around Hawthorn branches and counting fruits
 * one of the focal trees had been cut down
 
 ## 2021-09-28 Tuesday
 ### EJ & SG at Wytham
-* continued adding wire mesh cages around Hawthorn branches
+* 3rd survey
+* continued adding wire mesh cages around Hawthorn branches and counting fruits
 
 ## 2021-09-27 Monday
 ### EJ & SG at Wytham
+* 3rd survey
 * started adding wire mesh cages around Hawthorn branches
   * cages around 3 branches and labelled and counted fruits on 3 extra branches per tree
 
@@ -32,7 +73,7 @@
 
 ## 2021-09-02 Thursday
 ### EJ at Wytham
-* Completed second survey of focal Hawthorn individuals
+* Completed 2nd survey of focal Hawthorn individuals
 
 ## 2021-08-24 Tuesday
 ### Meeting: SG & EJ
@@ -50,12 +91,12 @@
 
 ## 2021-08-06 Friday
 ### EJ at Wytham
-* Second day counting fruits
+* Second day counting fruits for 1st survey
   * visited trees in the Eastern part of the woods which I did not reach yesterday
 
 ## 2021-08-05 Thursday
 ### EJ at Wytham
-* First day counting fruits
+* First day counting fruits for 1st survey
   * tried to visit all focal trees in one day but was unsuccessful
   * might be quicker the next time around as I won't need to choose branches
   * large variation in the amount of fruit on each tree, the sample size for some will be small
