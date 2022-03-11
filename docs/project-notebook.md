@@ -1,5 +1,34 @@
 # project-notebook
 
+## 2022-03-11 Friday
+* Compiled a table of host-specific arthropod Hawthorn fruit and seed eaters
+  * going off of photographs, I'm fairly confident we have *Anomoia purmunda* and *Blastodacna hellerella* larvae in the rearing pots
+
+## 2022-03-10 Thursday
+* Checked insect rearing pots
+  * Mice have found and eaten most horse chestnut seeds
+  * Found one weevil (*Sitona sp.*?) in pot of hornbeam seeds trapped between the mesh and the lid. Unsure if it actually came from the seeds.
+  * Saw one large grub in pot of oak seeds (pot 28, acorn weevil larvae?), did not collect
+  * 3 cocoons in pot of Ash seeds, did not collect
+* Researched Hawthorn germination
+  * Best method seems to be Bujarska-Borkowska (2002), cold and then warm stratification to break dormancy -> 90% germination
+  * For the pilot will try simply planting out this week, as stratification will take too long. They were collected in Jan  and been kept outside so have experienced some cold.
+
+## 2022-03-07 Monday
+### EJ at Wytham
+* 8th survey
+* removed wire cages
+
+## 2022-03-06 Sunday
+### EJ at Wytham
+* 8th survey
+* removed wire cages
+
+## 2022-03-04 Friday
+### EJ at Wytham
+* 8th survey
+* removed wire cages
+
 ## 2022-01-28 Friday
 ### EJ at Wytham
 * 7th survey
