@@ -1,5 +1,37 @@
 # project-notebook
 
+## 2022-04-07 Thursday
+### EJ and ST at Wytham
+* finished bagging branches for pollinator exclusion
+* visited 14 trees and bagged three branches each: 11, 32, 15, 14, 19, 18, 16, 17, 9, 10, 1, 2, 3, 4
+* many trees did not have flower buds yet - we will have to hope that the branches we have bagged will produce flowers this year
+* Hawthorn is very visible this time of year and not much else is in leaf - looked like Hawthorn density was very high in the woods. I think it will be important to note which trees have produced flowers and/or fruit when mapping for conspecific density
+* branch 11G replaces 11C
+
+## 2022-04-06 Wednesday
+### EJ and ST at Wytham
+* visited 11 trees and bagged three branches each: 24, 22, 33, 21, 30, 35, 28, 27, 34, 25, 29
+* tree 26 was falling over - tagged and bagged a new tree nearby ID 34
+* tree 23 had branches knocked off by foresters - tagged and bagged a new tree nearby ID 35
+* branch 30G replaces 30B
+
+## 2022-04-05 Tuesday
+### EJ at Wytham
+* started bagging branches with netting, mesh size: 0.28mm x 0.79mm
+* recorded a rough measure of phenology (early, mid, late) and took a photo of each branch
+* many trees had a mix of phenology with some branches more advanced than others
+* used a cable tie to secure to branch and closed edges with staples
+* bagged 3 branches from each of 7 trees: 5, 13, 12, 31, 8, 7, 6
+* bagged branches A, B, C except in cases where branch was no longer suitable - in these cases I would tag a new branch, G
+* bag for 6C included neighbouring branch as difficult to bag without it
+* for tree 13 bagged branches A, B, E, not C
+
+## 2022-03-12 Saturday
+* Planted out Hawthorn seeds for germination pilot
+  * 46 were sown as is
+  * 46 were sown after soaking in water overnight and removal of pulp
+  * Seed trays with soaked & pulp removed seeds are indicated with a stick in the top left corner
+
 ## 2022-03-11 Friday
 * Compiled a table of host-specific arthropod Hawthorn fruit and seed eaters
   * going off of photographs, I'm fairly confident we have *Anomoia purmunda* and *Blastodacna hellerella* larvae in the rearing pots
