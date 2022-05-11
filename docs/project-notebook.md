@@ -1,4 +1,32 @@
 # project-notebook
+## 2022-05-09 Monday
+### ST EJ MG at Wytham
+* visited 10 focal trees to count flowers and do pollinator surveys
+* on 5/10 trees visited, tagged branches had no flowers - in future trips I will try counting flowers of nearby trees
+* there were herbivores inside some of the bags, mostly caterpillars which were probably there when the bags were added
+* noticed many flowers were damaged, possibly _Anthonomus pedicularius_ or _Anthonomus bituberculatus_
+  * would be good to count number of damaged flowers separately to total flower count
+* branch beating for pollinators went well, noticed more insects fell from flowering trees
+* flower visitor observations were not as successful, for the majority of surveys no flower visitors were recorded
+  * possible that pollinators prefer flowers higher up where we cannot observe them
+* conspecific density mapping is taking longer than expected, took 2-3 days to map 50m2 radius of one tree
+* approx 300 individuals were mapped in the 50m2 radius of the first tree (ID 33)
+
+## 2022-05-03 Tuesday
+### SG ST MG EJ CF at Wytham
+* Trialled protocols for mapping conspecific density with the dGPS and for pollinator study
+* Visited some focal trees and noticed that quite a few haven't flowered
+* The pollinator exclusion bag on branch C on tree 6 was open - but did not contain flowers
+* Whole tree phenology scoring - no flowers, majority buds, majority open flowers
+* mapping conspecific density:
+  * dense bramble undergrowth made mapping difficult MG will start at trees with easier terrain and we will hire some short-term field assistants for extra help with those trees
+  * dGPS data can be taken at three different resolutions - FIX: 2 cm resolution, FLOAT: 1 m resolution, SINGLE: ~ 5 m (regular gps accuracy). Will try and get FIX when possible but FLOAT also acceptable
+  * multi-stem trees: keep a note about how many stems smaller than 5cm dbh (as in the ForestGEO protocol) + measure the circumference of the biggest stem
+* pollinator study:
+  * ST will beat 3 branches of two nearest conspecific neighbours to focal trees (one flowering, one not flowering) for 5 beats each
+  * the two conspecific neighbours will also be tagged and co-ordinates recorded
+  * will record whether the tree is  in flower
+  * ST will observe flower visitors to focal trees in a 1 m2 area for 5 mins
 
 ## 2022-04-07 Thursday
 ### EJ and ST at Wytham
