@@ -1,4 +1,24 @@
 # project-notebook
+## 2022-05-13 Friday
+### EJ MG at Wytham
+* counted flowers as yesterday, ST will continue next week
+* pots of collected fruits and seeds were left in the sun and many melted
+  * can't be sure nothing escaped
+  * also possible that the heat has killed any developing pupae
+  * relocated the contents into new pots
+  * some of the lids popped off (5 pots) so could be labelled wrong
+
+## 2022-05-12 Thursday
+### ST EJ MG at Wytham
+* visited focal trees to count flowers and do pollinator surveys
+* if no flowers on marked unbagged branches, counted other branches (and marked them G, H or I) or branches of neighbouring trees (trees marked as: focal tree number _point_ 1, 2 or 3)
+* damaged flowers were included in the count of total flowers and also counted separately 
+* counted as damaged if reproductive parts of flower were no longer viable/visible
+
+## 2022-05-11 Wednesday
+* started counting diptera larvae in pots of Haws collected Autumn 2021 from nearest neighbour
+  * found some wasps - look parasitoid 
+
 ## 2022-05-09 Monday
 ### ST EJ MG at Wytham
 * visited 10 focal trees to count flowers and do pollinator surveys
