@@ -69,4 +69,7 @@ code/exploration/*.html
 # nope
 *.docx
 *.xlsx
+*.xls
 docs/*.jpg
+data/
+docs/*.pdf
