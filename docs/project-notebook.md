@@ -1,5 +1,21 @@
 # project-notebook
 
+## 2022-07-06
+### EJ SG PF AB at Wytham
+* PF will be conducting herbivory surveys and collecting fruits and seeds for insect rearing
+* AB is continuing with conspecific tree mapping whilst MG is away
+* developed herbivory protocol:
+  * surveys will be conducted on each of the focal trees, one or two nearest neighbours and potentially some individuals in areas of known high and low conspecific densities
+  * haphazardly select 10 (non tagged) branches on each tree
+  * count 50 leaves on each of the branches from the tip of the branch moving inwards
+  * if herbivory is present on a leaf collect it in a zip lock bag 
+  * keep separate zip lock bags per branch with ID numbers as "`tree_id` - 1, 2, 3... 10"
+  * transfer leaves to small paper envelopes, record a count of: # of leaves collected, # small green leaf folds, # mines, # tent-like leaf folds (this list can be extended based on types of herbivory commonly found in the samples/easily identified)
+  * keep all small (branch level) envelopes in a larger (tree level) envelope
+  * leaves will be lightly pressed under a box until we purchase a plant press
+  * % herbivory estimates will be calculated at a later date from the dry leaves - perhaps using image software e.g. LeafByte or ImageJ
+* Haws that were planted 2022-03-12 for a germination pilot have not germinated. Think it is now unlikely that they will germinate this year if at all. For any future attempt I will follow the stratification method detailed in [Persson _et al._](https://doi.org/10.15258/sst.2006.34.3.04). 
+
 ## 2022-06-17 Friday
 ### EJ at Wytham
 * counted initial fruit set on branches of marked individuals and removed bags
