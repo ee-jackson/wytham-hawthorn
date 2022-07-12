@@ -67,6 +67,7 @@ code/graveyard
 code/exploration/*.html
 
 # nope
+secrets.R
 *.docx
 *.xlsx
 *.xls
