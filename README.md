@@ -1,6 +1,8 @@
-# wytham-seed-predation
+# wytham-hawthorn
 
-This repository contains code for the Wytham Hawthorn project, lead by Sofia Gripenberg's research group at the University of Reading.
+This repository contains the [research compendium](https://research-compendium.science) for the Wytham Hawthorn project, lead by Sofia Gripenberg's research group at the University of Reading. The compendium is a collection of all digital parts of the research project to date.
+
+We are investigating the roles of plant enemies and mutualists in determining the spatial distribution of Hawthorn (*Crataegus monogyna*) in Wytham Woods.
 
 ## Contents:
 
