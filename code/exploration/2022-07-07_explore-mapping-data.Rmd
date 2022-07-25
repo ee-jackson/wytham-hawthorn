@@ -1,5 +1,5 @@
 ---
-title: "First look at mapping data"
+title: "First look at mapping data; cleaning and connectivity"
 author: "Eleanor Jackson"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 always_allow_html: true
@@ -10,6 +10,7 @@ output:
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(fig.path = "figures/2022-07-07_explore-mapping-data/")
 source(here::here("code", "secrets.R"))
+library("emo")
 ```
 
 We want to conduct herbivory surveys on individuals at high and low conspecific densities. To identify them we'll need a measure of connectivity. I'm going to take a first look at the mapping data that has been collected so far and have a go at calculating connectivity for all of the trees.
@@ -19,6 +20,7 @@ library("tidyverse")
 library("janitor")
 library("googledrive")
 library("here")
+library("rdist")
 ```
 
 ## Cleaning
@@ -40,11 +42,14 @@ data_list <- lapply(urls, read.csv, na.strings = c("","NA"))
 
 repair_col_names <- function (plot) {
   plot %>%
-    rename_with(recode, "DBH" = "BHD") %>%
-    mutate(BHD = ifelse("BHD" %in% names(.), BHD, NA),
-           BHC = ifelse("BHC" %in% names(.), BHC, NA),
+    rename_with(recode, "BHD" = "DBH") %>%
+    rename_with(recode, "BHC" = "CBH") %>%
+    rowwise() %>%
+    mutate(DBH = ifelse("DBH" %in% names(.), DBH, NA),
+           CBH = ifelse("CBH" %in% names(.), CBH, NA),
            Other.HC = ifelse("Other.HC" %in% names(.), Other.HC, NA)) %>% 
-    mutate(across(c(BHD, BHC, Other.HC, Other.HD), as.numeric)) %>%
+    ungroup() %>%
+    mutate(across(c(DBH, CBH, Other.HC, Other.HD), as.numeric)) %>%
     mutate(Notes = as.character(Notes)) %>%
     select(-contains("X"))
 }
@@ -52,23 +57,113 @@ repair_col_names <- function (plot) {
 data_list_col_repair <- lapply(data_list, repair_col_names)
 
 repair_tree_names <- function (plot, plot_name) {
-  plot %>%
+  plot %>% 
+    # remove any letters
+    mutate(Name = gsub("[a-zA-Z]+", "", x = Name, ignore.case = TRUE)) %>%
+    #remove leading zeros
+    mutate(Name = gsub("^0+", "", Name) ) %>% 
+    # rename 1st row as focal tree
     mutate(Name = replace(Name, pluck(1, 1), 
                           paste0("focal_", readr::parse_number(plot_name)))) %>%
-    mutate(Name = gsub("h", "", x = Name, ignore.case = TRUE)) %>%
-    mutate(Name = sub("^0+", "", Name) ) %>%
     mutate(Name = as.factor(Name))
 }
 
 data_list_name_repair <- imap(data_list_col_repair, repair_tree_names)
-
+      
 all_plots <- bind_rows(data_list_name_repair, .id = "plot")
 
 all_plots %>%
-  clean_names() %>%
-  remove_empty("rows") %>% 
+  clean_names() %>% 
   fill(c("name", "longitude", "latitude", "solution_status", 
-         "cs_name", "form", "reproductive")) -> clean_plots
+         "cs_name", "form", "reproductive")) %>%
+  mutate(plot = gsub(".csv", "", x = plot)) %>%
+  rename(tree_id = name) %>%
+  group_by(plot) %>%
+  mutate(stem_id = 1:n()) %>%
+  ungroup() %>% 
+  add_count(tree_id, plot, name = "n_stems") %>% 
+  rowwise() %>%
+  mutate(dbh = ifelse(is.na(dbh), cbh/pi, dbh)) %>%
+  ungroup() %>%
+  mutate(status = ifelse(is.na(status), "A", status)) %>%
+  mutate_if(is.character, tolower) %>%
+  mutate(tree_id = paste("tree", tree_id, sep = "_"),
+         stem_id = paste("stem", stem_id, sep = "_")) -> clean_plots
 
 ```
+
+## Calculate distances
+
+For the ForestGeo data they use the dbh of the largest stem of a multi-stemmed tree - so I have done that here too.
+
+```{r}
+clean_plots %>%
+  drop_na(dbh) %>% # this will drop dbh that were below breast height
+  filter(status != "D") %>% 
+  group_by(plot, tree_id) %>% 
+  slice_max(dbh, with_ties = FALSE) %>% 
+  ungroup() -> largest_stems
+
+calculate_dist <- function (plot_id, data) {
+  
+  filter(data, plot == plot_id) -> plot_data
+
+	plot_data %>%
+    select(latitude, longitude) -> plot_matrix
+
+	rdist::pdist(plot_matrix[,c("latitude", "longitude")], 
+	             metric = "euclidean") -> dists
+	
+	as.data.frame(dists) -> dists_df
+
+	unlist(plot_data$tree_id) -> colnames(dists_df) 
+
+	cbind(plot_data, dists_df)
+	
+}
+
+largest_stems %>% 
+  distinct(plot) %>%
+  pull(plot) -> plot_id_list
+
+distance_dfs <- lapply(plot_id_list, calculate_dist, 
+                       data = largest_stems)
+```
+
+## Calculate connectivity
+
+Connectivity is proving harder to calculate than I thought. Compared to last time, when we calculated connectivity for one trap based on trees in a radius, now we're trying to calculate the connectivity of every tree in the plot.. `r emo::ji("cold_sweat")`
+
+Think I'll just stick to getting the connectivity of each of the focal trees for now.
+
+```{r}
+calculate_connectivity <- function (data) {
+  data %>%
+    distinct(tree_id) %>%
+    pull(tree_id) -> distinct_trees
+  
+  for (tree in distinct_trees) {
+    data %>%
+      rowwise() %>%
+      mutate(x = dbh * exp((-0.02) * eval(parse(text = tree)))) %>%
+      ungroup() %>%
+      summarise(
+        tree_id = paste(tree),
+        connectivity = sum(x)
+      ) -> output
+  }
+  
+  return(output)
+  
+}
+
+connectivity_dfs <- lapply(distance_dfs, calculate_connectivity)
+
+all_connectivity_dfs <- dplyr::bind_rows(connectivity_dfs)
+
+knitr::kable(all_connectivity_dfs)
+
+```
+
+
 
