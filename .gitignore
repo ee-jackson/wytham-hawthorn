@@ -77,6 +77,4 @@ docs/*.pdf
 data/*
 !data/raw
 data/raw/*
-!data/raw/focal_trees.csv
-!data/raw/waypoints.gpx
 !data/raw/tree_id_checklist.csv
