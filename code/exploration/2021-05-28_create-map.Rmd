@@ -57,8 +57,6 @@ get_map(bbox, source = "stamen", force = TRUE, maptype = "toner-background") %>%
 
 ```
 
-It's not very detailed - we can't see any of the trails
-
 ## Make an interactive map
 
 ### make the data a SpatialPointsDataFrame object 

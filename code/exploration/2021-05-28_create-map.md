@@ -48,8 +48,6 @@ get_map(bbox, source = "stamen", force = TRUE, maptype = "toner-background") %>%
 
 ![](figures/2021-05-28_create-map/ggmap-1.png)<!-- -->
 
-It’s not very detailed - we can’t see any of the trails
-
 ## Make an interactive map
 
 ### make the data a SpatialPointsDataFrame object
