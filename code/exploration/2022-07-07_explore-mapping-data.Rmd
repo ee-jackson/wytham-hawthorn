@@ -30,7 +30,7 @@ googledrive::drive_auth(email = "eleanor.elizabeth.j@gmail.com",
                         scopes = "https://www.googleapis.com/auth/drive") 
 
 files <- drive_ls(GDRIVE_FOLDER_URL,
-                  pattern = "^[0-9]{2}.csv")
+                  pattern = "^[0-9]{2}.csv") # don't use incomplete plots
 
 files  %>%
   mutate(id = sprintf("https://docs.google.com/uc?id=%s&export=download", id)) %>%
@@ -94,7 +94,7 @@ all_plots %>%
 
 ## Calculate distances
 
-For the ForestGeo data they use the dbh of the largest stem of a multi-stemmed tree - so I have done that here too.
+For the ForestGeo data they use the diameter at breast height (`dbh`) of the largest stem of a multi-stemmed tree - so I have done that here too.
 
 ```{r}
 clean_plots %>%
@@ -132,38 +132,98 @@ distance_dfs <- lapply(plot_id_list, calculate_dist,
 
 ## Calculate connectivity
 
-Connectivity is proving harder to calculate than I thought. Compared to last time, when we calculated connectivity for one trap based on trees in a radius, now we're trying to calculate the connectivity of every tree in the plot.. `r emo::ji("cold_sweat")`
+Connectivity is proving harder to calculate than I thought. Compared to last time, when we calculated connectivity for one trap based on trees in a radius, we're now trying to calculate connectivity values for *every* tree in the plot.. `r emo::ji("cold_sweat")`
 
-Think I'll just stick to getting the connectivity of each of the focal trees for now.
+I might try and think of another way to identify individuals at high and low conspecific densities. This seems like too much effort and computing power for this task.
+
+Think I'll just stick to getting the connectivity of each of the focal trees for now - just to see what it looks like. 
 
 ```{r}
-calculate_connectivity <- function (data) {
+all_distance_dfs <- dplyr::bind_rows(distance_dfs)
+
+all_distance_dfs %>%
+  filter(grepl("focal", tree_id)) %>%
+  pull(tree_id) -> focal_tree_id_list
+
+calculate_connectivity <- function (data, focal_tree_id) {
   data %>%
-    distinct(tree_id) %>%
-    pull(tree_id) -> distinct_trees
-  
-  for (tree in distinct_trees) {
-    data %>%
-      rowwise() %>%
-      mutate(x = dbh * exp((-0.02) * eval(parse(text = tree)))) %>%
-      ungroup() %>%
-      summarise(
-        tree_id = paste(tree),
-        connectivity = sum(x)
-      ) -> output
-  }
-  
-  return(output)
-  
+    group_by(plot, tree_id) %>%
+    mutate(x = dbh * exp((-0.02) * eval(parse(text = focal_tree_id)) ) ) %>%
+    ungroup() %>%
+    group_by(plot) %>%
+    summarise(tree_id = paste(focal_tree_id),
+              connectivity = sum(x), .groups = "drop")
 }
 
-connectivity_dfs <- lapply(distance_dfs, calculate_connectivity)
+connectivity_dfs <- lapply(focal_tree_id_list, 
+                              calculate_connectivity, data = all_distance_dfs)
 
-all_connectivity_dfs <- dplyr::bind_rows(connectivity_dfs)
+connectivity_dfs %>%
+  lapply(drop_na, connectivity) %>%
+  dplyr::bind_rows() -> all_connectivity_dfs
 
 knitr::kable(all_connectivity_dfs)
 
 ```
 
+We are missing connectivity values for plots `22`, `33` and `35` - this is because they have no recorded `dbh` and thus they were filtered out when I created `largest_stems`. Not sure why they have no `dbh`, will check with Matt. Think I have this data recorded somewhere anyway.
 
+## Other Hawthorn abundance metrics
 
+Let's do some sanity checks. Does connectivity roughly align with the number of trees per plot?
+
+Looking at `n_trees` per plot will also help us to get an idea about the range of Hawthorn densities in the mapped plots so far.
+
+```{r n-trees}
+all_distance_dfs %>%
+  group_by(plot) %>%
+  summarise(n_trees = n_distinct(tree_id)) -> sum_trees
+
+check_data <- left_join(all_connectivity_dfs, sum_trees, by = "plot")
+
+check_data %>%
+  pivot_longer(cols = c("connectivity", "n_trees")) %>%
+  ggplot(aes(
+    x = plot,
+    y = value,
+    group = name,
+    colour = name
+  )) +
+  geom_path() +
+  theme_bw() +
+  facet_grid(rows = "name", scales = "free")
+      
+```
+
+Kind of... something weird going on with plot 24. Perhaps lots of small trees, or many trees which are far from the focal tree? I guess they are measuring quite different things.
+
+Let's also calculate the summed basal area to compare.
+
+```{r basal-area}
+largest_stems %>%
+  rowwise() %>%
+  mutate(basal_area = ((dbh / 2)**2) * pi ) %>%
+  ungroup() %>%
+  group_by(plot) %>%
+  summarise(sum_basal_area = sum(basal_area), .groups = "drop") -> sum_area
+
+check_data_2 <- left_join(check_data, sum_area, by = "plot")
+
+check_data_2 %>%
+  pivot_longer(cols = c("connectivity", "n_trees", "sum_basal_area")) %>%
+  ggplot(aes(
+    x = plot,
+    y = value,
+    group = name,
+    colour = name
+  )) +
+  geom_path() +
+  theme_bw() +
+  facet_grid(rows = "name", scales = "free")
+```
+
+Summed basal area matches connectivity much more than `n_trees` - which is good and as expected since `dbh` was used to calculate both of those values.
+
+Before we start using these connectivity values properly we are going to have to think about edge effects, i.e. there could be loads of Hawthorn just outside of the plot boundaries.
+
+Anyway, I'm glad that connectivity seems to align with these other abundance metrics and there seems to be a bit of variation in Hawthorn abundance between the plots so far. Most have low abundance but I think the most difficult (Hawthorn abundant) plots have been saved to last. So we may yet see more Hawthorn dense plot data.
