@@ -40,5 +40,5 @@ This folder is located at `data/raw/hawthorn-mapping` and contains a `.csv` file
 | `dark_lower_mines_total` | Count of dark lower mines across all `leaves_w_herbivory` |
 | `pale_lower_mines_total` | Count of pale lower mines across all `leaves_w_herbivory`|
 | `lice_total` | Count of leaves which had plant lice |
-| `rust_presence` | `TRUE` (presence) or `FALSE` (absence) of rust on leaves. Leaves with rust were not included in the count of `leaves_w_herbivory`  |
-| `brown_curls_total` | Count of pale lower mines across all `leaves_w_herbivory`. The brown curl damage type was originally classified as tents and counted in `tents_total`. Where `brown_curls_total` = `NA`, brown curls are included in `tents_total`. |
+| `rust_presence` | `TRUE` (presence) or `FALSE` (absence) of rust on leaves. Leaves with rust were not included in the count of `leaves_w_herbivory`.  |
+| `brown_curls_total` | Count of brown curls across all `leaves_w_herbivory`. The brown curls were originally classified as tents and counted in `tents_total`. Where `brown_curls_total` = `NA`, brown curls are included in `tents_total`. |
