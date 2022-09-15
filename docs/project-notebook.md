@@ -1,5 +1,14 @@
 # project-notebook
 
+## 2022-09-13
+### EJ at Wytham
+* conducted the final fruit count for the pollination/fruit set dataset
+
+## 2022-09-05
+* transferred the contents of the remaining insect rearing pots at EJ's house into plastic bags
+  * collected any insects in 95% ethanol (all insects found were already dead)
+  * will keep the fruits/seeds in their bags at Reading in case we want to dissect them / check for herbivore damage
+
 ## 2022-07-06
 ### EJ SG PF AB at Wytham
 * PF will be conducting herbivory surveys and collecting fruits and seeds for insect rearing
