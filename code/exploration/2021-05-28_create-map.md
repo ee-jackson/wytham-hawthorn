@@ -1,7 +1,7 @@
 Make a map of focal trees
 ================
 Eleanor Jackson
-25 July, 2022
+11 October, 2022
 
 ``` r
 library("tidyverse")
@@ -9,6 +9,7 @@ library("sp")
 library("ggmap")
 library("geojsonio")
 library("leaflet")
+library("osmdata")
 ```
 
 ## Read in gpx file and clean up
@@ -35,15 +36,29 @@ read.csv(here::here("data", "raw", "tree_id_checklist.csv")) %>%
 ## Make a static map
 
 ``` r
-bbox <- make_bbox(c(min(tree_list$long_dd), max(tree_list$long_dd)), 
-                  c(min(tree_list$lat_dd), max(tree_list$lat_dd)))
+bbox <- make_bbox(c(min(tree_list$long_dd) - 0.001, 
+                    max(tree_list$long_dd)) + 0.001, 
+                  c(min(tree_list$lat_dd) - 0.001, 
+                    max(tree_list$lat_dd) + 0.001))
 
-get_map(bbox, source = "stamen", force = TRUE, maptype = "toner-background") %>%
+osmdata::opq(bbox = bbox) %>%
+  add_osm_feature(key = "highway") %>%
+  osmdata_sf() -> osm_trails
+
+tree_list %>%
+  filter(focal == TRUE) %>%
+  filter(tree_id != "23" & tree_id != "26") -> tree_list_focal
+
+get_map(bbox, source = "stamen", force = TRUE, maptype = "terrain") %>%
   ggmap() +
-  geom_point(data = filter(tree_list, focal == TRUE),
-             colour = "forestgreen",
+  geom_sf(data = osm_trails$osm_lines,
+          inherit.aes = FALSE, colour = "grey60") +
+  geom_point(data = tree_list_focal,
+             colour = "red", shape = 4,
            aes(long_dd, lat_dd)) +
-  theme_classic()
+  geom_text(data = tree_list_focal,
+             aes(long_dd, lat_dd, label = tree_id), hjust = -0.5) +
+  theme_void()
 ```
 
 ![](figures/2021-05-28_create-map/ggmap-1.png)<!-- -->
