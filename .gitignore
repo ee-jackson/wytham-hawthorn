@@ -65,6 +65,7 @@ Temporary Items
 # ignore these folders
 code/graveyard
 code/exploration/*.html
+output/plots
 
 # nope
 secrets.R
