@@ -14,13 +14,13 @@ This folder is located at `data/raw/hawthorn-mapping` and contains a `.csv` file
 | `reproductive` | Either `y` (the individual had flowers or fruits at the time of recording) or `n` (the individual did not have flowers or fruits at the time of recording) |
 | `d` | Either `y` (the tree was dead) or `n` (the tree was not dead) |
 | `q` | Either `y` (the tree was broken above 1.3m) or `n` (the tree was not broken above 1.3m) |
-| `h` | Either `y` (the tree was leaning or horizontal) or `n` (the tree was not learning or horizontal) |
+| `h` | Either `y` (the tree was leaning or horizontal) or `n` (the tree was not leaning or horizontal) |
 | `susie` | Either `y` (the tree had pink tags) or `n` (the tree did not have pink tags) |
 | **Stem variables** | |
 | `stem` | For individuals whose stems split below 1.3 meters, the stem is either `main` (`DBH` taken below the split) or `secondary` (`DBH` taken above the split at 1.3m) |
-| `DBH` | Diameter of the stem at breast height (1.3m) |
+| `dbh` | Diameter of the stem at breast height (1.3m) |
 | `split_height` | Recorded where `form` = `s` and `stem` = `main`, the height at which the main stem splits below 1.3m |
-| `other_hd` | Recorded where `form` = `s` and `stem` = `main`, diameter of stem at the specified split height |
+| `other_d` | Recorded where `form` = `s` and `stem` = `main`, diameter of stem at the specified split height |
 |:---------|:------------|
 | `notes` | Any notes taken during data collection |
 
