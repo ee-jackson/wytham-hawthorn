@@ -67,13 +67,14 @@ code/graveyard
 code/exploration/*.html
 output/plots
 
+/docs/
+!/docs/*md
+
 # nope
 secrets.R
 *.docx
 *.xlsx
 *.xls
-docs/*.jpg
-docs/*.pdf
 
 data/*
 !data/raw
