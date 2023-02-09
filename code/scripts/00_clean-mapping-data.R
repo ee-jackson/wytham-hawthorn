@@ -3,7 +3,7 @@
 ## Author: E E Jackson, eleanor.elizabeth.j@gmail.com
 ## Script: 00_clean-mapping-data.R
 ## Desc: Read mapping data in from the Google Drive and make it tidy
-## Date: July 2023
+## Date created: July 2023
 
 # Load packages -----------------------------------------------------------
 
@@ -41,12 +41,22 @@ repair_cols <- function (plot) {
 
 data_list_col_repair <- lapply(data_list, repair_cols)
 
+
+# Add missing plots -------------------------------------------------------
+
+# Tree 26 is in the same plot as tree 34 but needs it's own df
+data_list_col_repair$`34.csv` %>%
+  mutate(name = recode(name,
+                       `0` = as.integer(123),
+                       `3` = as.integer(0))) -> data_list_col_repair$`26.csv`
+
+
 # Tidy rows ---------------------------------------------------------------
 
 all_plots <- bind_rows(data_list_col_repair, .id = "plot")
 
 all_plots %>%
-  select(-name_1, -description) %>%
+  select(-description) %>%
   mutate(plot = gsub(".csv", "", x = plot)) %>%
   rename(
     tree_id = name,
@@ -55,7 +65,8 @@ all_plots %>%
     broken = q,
     susie_id = susie
   ) %>%
-  mutate(susie_id = case_when(!is.na(tree_id) ~ susie_id,
+  mutate(stem = replace_na(stem, "main"),
+         susie_id = case_when(!is.na(tree_id) ~ susie_id,
                               TRUE ~ NA_character_)) %>%
   fill(
     c("tree_id", "longitude", "latitude", "solution_status", "cs_name",
@@ -79,7 +90,7 @@ all_plots %>%
 
 # only keep the largest stem of a multi-stemmed tree
 clean_plots %>%
-  drop_na(dbh) %>% # this will drop dbh that were below breast height
+  drop_na(dbh) %>% # this will drop diameter measurements that were below breast height
   filter(dead == FALSE) %>%
   group_by(plot, tree_id) %>%
   slice_max(dbh, with_ties = FALSE) %>%
