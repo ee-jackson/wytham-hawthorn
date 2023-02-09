@@ -1,5 +1,8 @@
 # project-notebook
 
+## 2023-02-08
+* Haws for germination trial were collected in mid October (100 from each focal tree). They have been at room temp (in Sofia's office) since 2022-11-01 (100 days) and were moved into 5 degree fridge today.
+
 ## 2022-09-13
 ### EJ at Wytham
 * conducted the final fruit count for the pollination/fruit set dataset
