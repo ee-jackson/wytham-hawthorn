@@ -27,7 +27,7 @@ readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
   filter(tree_id == "tree_0") %>%
   mutate(tree_id = as.numeric(plot)) %>% 
-  left_join(readRDS(here::here("data", "raw", "fruit_drop_data.rds")), 
+  left_join(readRDS(here::here("data", "clean", "fruit_drop_data.rds")), 
             by = "tree_id") %>%
   sf::st_as_sf(coords = c("latitude", "longitude"), 
                crs = 4326, remove = FALSE) %>%
