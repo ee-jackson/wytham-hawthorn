@@ -45,12 +45,22 @@ fruit_counts %>%
 
 # summarise ---------------------------------------------------------------
 
-# Tree 20 died and we only got 2 time-points of data, I drop it here
 survey_data %>%
   group_by(branch_id) %>%
   summarise(across(c(tree_id, exclusion, length_cm)),
             total_fruit = max(n_fruit),
             n_dropped = max(n_fruit) - min(n_fruit), .groups = "drop") %>%
-  mutate(proportion_dropped = n_dropped / total_fruit) %>%
-  filter(tree_id != "tree_20") %>%
-  saveRDS(here::here("data", "raw", "fruit_drop_data.rds"))
+  distinct() %>%
+  mutate(proportion_dropped = n_dropped / total_fruit) -> summary_fruit
+
+
+# add dbh -----------------------------------------------------------------
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(plot = as.numeric(plot)) %>%
+  select(plot, dbh) %>%
+  inner_join(summary_fruit, by = c("plot" = "tree_id")) %>%
+  rename(tree_id = plot) %>%
+  saveRDS(here::here("data", "clean", "fruit_drop_data.rds"))
+
