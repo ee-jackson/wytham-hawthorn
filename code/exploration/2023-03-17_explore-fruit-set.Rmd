@@ -1,0 +1,127 @@
+---
+title: "Explore fruit set data"
+author: '`r Sys.getenv("USER")`'
+date: '`r format(Sys.time(), "%d %B, %Y")`' 
+always_allow_html: true
+output: 
+  github_document:
+    keep_html: true
+---
+	
+```{r setup, include = FALSE}
+file_name <- rstudioapi::getSourceEditorContext()$path
+
+knitr::opts_chunk$set(
+  fig.path =
+    paste0("figures/", sub("\\.Rmd$", "", basename(file_name)), "/", sep = "")
+)
+
+ggplot2::theme_set(ggplot2::theme_classic(base_size = 10))
+```
+
+```{r packages, message=FALSE, warning=FALSE}
+library("tidyverse")
+library("here")
+```
+
+```{r data}
+read.csv(here::here("data", "raw", "fruit_set_flower_counts.csv"),
+  header = TRUE, na.strings = c("", "NA")) %>% 
+  rename(count = n_flowers) %>% 
+  mutate(unit = "flower") %>% 
+  select(date, tree_id, branch_id, count, unit, bagged, notes) %>% 
+  group_by(tree_id, branch_id) %>%
+  slice_max(count, with_ties = FALSE) %>% 
+  ungroup() -> flowers
+
+read.csv(here::here("data", "raw", "fruit_set_initial_fruit_set.csv"),
+  header = TRUE, na.strings = c("", "NA")) %>% 
+  rename(count = n_fruits) %>% 
+  mutate(unit = "immature_fruit") -> initial_fruit
+
+read.csv(here::here("data", "raw", "fruit_set_final_fruit_set.csv"),
+  header = TRUE, na.strings = c("", "NA")) %>% 
+  rename(count = n_fruits) %>% 
+  mutate(unit = "mature_fruit", bagged = NA) -> final_fruit
+
+readRDS(here::here("data", "clean", "connectivity_data_repro.rds")) %>% 
+  select(tree_id, connectivity, dbh) %>% 
+  distinct() -> connectivity
+
+```
+
+## initial fruit set ~ reproductive connectivity
+
+```{r immature-fruit-set}
+bind_rows(flowers, initial_fruit) %>% 
+  pivot_wider(id_cols = c(tree_id, branch_id, bagged), 
+              names_from = unit, values_from = count) %>%
+  mutate(focal_tree = as.integer(tree_id)) %>% 
+  mutate(focal_tree = as.factor(focal_tree)) %>% 
+  inner_join(connectivity, by = c("focal_tree" = "tree_id")) %>% 
+  filter(bagged == FALSE) %>%  
+  ggplot(aes(y = immature_fruit/flower, x = connectivity)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ylim(0, 1)
+
+```
+
+## mature fruit ~ reproductive connectivity
+
+```{r mature-fruit-set}
+final_fruit %>% 
+  select(tree_id, branch_id) %>% 
+  left_join(select(initial_fruit, tree_id, branch_id, bagged)) %>% 
+  right_join(final_fruit) %>% 
+  mutate(bagged = replace_na(bagged, FALSE)) -> final_fruit_bags
+
+bind_rows(flowers, final_fruit_bags) %>% 
+  pivot_wider(id_cols = c(tree_id, branch_id, bagged), 
+              names_from = unit, values_from = count) %>% 
+  mutate(mature_fruit = ifelse(is.na(mature_fruit), 0, mature_fruit)) %>% 
+  mutate(focal_tree = as.integer(tree_id)) %>% 
+  mutate(focal_tree = as.factor(focal_tree)) %>% 
+  inner_join(connectivity, by = c("focal_tree" = "tree_id")) %>% 
+  filter(bagged == FALSE) %>%  
+  ggplot(aes(y = mature_fruit/flower, x = connectivity)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ylim(0, 1)
+```
+
+## mature/immature ~ reproductive connectivity
+
+```{r immature-to-mature}
+bind_rows(initial_fruit, final_fruit_bags) %>% 
+  pivot_wider(id_cols = c(tree_id, branch_id, bagged), 
+              names_from = unit, values_from = count) %>% 
+  mutate(mature_fruit = ifelse(is.na(mature_fruit), 0, mature_fruit)) %>% 
+  mutate(focal_tree = as.integer(tree_id)) %>% 
+  mutate(focal_tree = as.factor(focal_tree)) %>% 
+  inner_join(connectivity, by = c("focal_tree" = "tree_id")) %>% 
+  filter(bagged == FALSE) %>%  
+  ggplot(aes(y = mature_fruit/immature_fruit, x = connectivity)) +
+  geom_point() +
+  ylim(0, 1) +
+  ggtitle("proportion of immature fruits becoming mature fruits")
+```
+
+
+## proportion of flowers damaged ~ reproductive connectivity
+
+```{r flowers-damaged}
+read.csv(here::here("data", "raw", "fruit_set_flower_counts.csv"),
+  header = TRUE, na.strings = c("", "NA")) %>% 
+  group_by(tree_id, branch_id) %>%
+  slice_max(n_flowers, with_ties = FALSE) %>% 
+  mutate(focal_tree = as.integer(tree_id)) %>% 
+  mutate(focal_tree = as.factor(focal_tree)) %>% 
+  inner_join(connectivity, by = c("focal_tree" = "tree_id")) %>% 
+  ggplot(aes(y = n_flowers_damaged / n_flowers, x = connectivity)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+  
+```
+
+
