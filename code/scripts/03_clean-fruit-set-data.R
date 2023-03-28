@@ -35,11 +35,22 @@ tibble(filename = c("fruit_set_flowers.csv", "fruit_set_flowers.csv",
 
 pmap(raw_data_input, clean_raw_data) %>%
   bind_rows() %>%
-  pivot_wider(id_cols = c(tree_id, branch_id),
-              names_from = unit, values_from = count) %>%
-  mutate(across(c(n_immature_fruits, n_mature_fruits),
-                ~ case_when(is.na(.) & n_flowers == 0 ~ 0,
-                            TRUE ~ . ))) -> all_counts
+  pivot_wider(
+    id_cols = c(tree_id, branch_id),
+    names_from = unit,
+    values_from = count
+  ) %>%
+  mutate(across(
+    c(n_immature_fruits, n_mature_fruits),
+    ~ case_when(is.na(.) & n_flowers == 0 ~ 0,
+                TRUE ~ .)
+  )) %>%
+  mutate(
+    n_flowers = case_when(
+      n_immature_fruits > n_flowers ~ n_immature_fruits,
+      TRUE ~ n_flowers
+    )
+  ) -> all_counts
 
 
 # extract data on if branch was bagged ------------------------------------
@@ -57,9 +68,16 @@ all_counts_bag %>%
   mutate(focal_tree = as.integer(tree_id)) %>%
   inner_join(connectivity, by = c("focal_tree" = "plot")) %>%
   mutate(branch_id = tolower(branch_id)) %>%
-  mutate(branch_id = paste0(tree_id, branch_id)) %>%
+  mutate(branch_id = paste0(tree_id, branch_id)) -> all_counts_bag_con
+
+
+# add dbh -----------------------------------------------------------------
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(plot = as.numeric(plot)) %>%
+  select(plot, dbh) %>%
+  inner_join(all_counts_bag_con, by = c("plot" = "focal_tree"),
+             multiple = "all") %>%
+  rename(focal_tree = plot) %>%
   saveRDS(here::here("data", "clean", "fruit_set_data.rds"))
-
-
-
-
