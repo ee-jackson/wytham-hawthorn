@@ -50,6 +50,12 @@ data_list_col_repair$`34.csv` %>%
                        `0` = as.integer(123),
                        `3` = as.integer(0))) -> data_list_col_repair$`26.csv`
 
+# Tree 23 is in the same plot as tree 35 but needs it's own df
+data_list_col_repair$`35.csv` %>%
+  mutate(name = recode(name,
+                       `0` = as.integer(153),
+                       `11` = as.integer(0))) -> data_list_col_repair$`23.csv`
+
 
 # Tidy rows ---------------------------------------------------------------
 
