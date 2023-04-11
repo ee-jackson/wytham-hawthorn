@@ -1,0 +1,125 @@
+---
+title: "Exploring the herbivory data"
+author: '`r Sys.getenv("USER")`'
+date: '`r format(Sys.time(), "%d %B, %Y")`' 
+always_allow_html: true
+output: 
+  github_document:
+    keep_html: true
+---
+	
+```{r setup, include = FALSE}
+file_name <- rstudioapi::getSourceEditorContext()$path
+
+knitr::opts_chunk$set(
+  fig.path =
+    paste0("figures/", sub("\\.Rmd$", "", basename(file_name)), "/", sep = "")
+)
+
+ggplot2::theme_set(ggplot2::theme_classic(base_size = 10))
+```
+
+```{r packages, message=FALSE, warning=FALSE}
+library("tidyverse")
+library("here")
+```
+
+```{r}
+readRDS(here::here("data", "clean", "connectivity_data.rds")) -> connectivity
+
+read_csv(here::here("data", "raw", "hawthorn_herbivory.csv")) -> herbivory
+
+```
+```{r}
+herbivory %>%
+  dplyr::filter(!grepl("S", sample)) %>%
+  mutate(focal_tree = as.integer(tree_id)) %>%
+  select(tree_id, focal_tree, sample, date,
+         n_leaves_assessed, leaves_w_herbivory) %>%
+  inner_join(connectivity, by = c("focal_tree" = "plot")) -> clean
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(plot = as.numeric(plot)) %>%
+  select(plot, dbh) %>%
+  left_join(clean, by = c("plot" = "focal_tree"),
+             multiple = "all") %>% 
+  mutate(is_focal = case_when( floor(tree_id) == tree_id ~ TRUE,
+                               .default = FALSE)) -> clean_dbh
+
+```
+
+
+```{r}
+ggplot(filter(clean_dbh, is_focal == TRUE), aes(y = leaves_w_herbivory/n_leaves_assessed, x = connectivity)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```{r}
+ggplot(filter(clean_dbh, is_focal == TRUE), aes(y = leaves_w_herbivory/n_leaves_assessed, x = dbh)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```{r}
+clean_dbh %>%
+  mutate(connectivity_sc = scale(connectivity),
+         dbh_sc = scale(dbh),
+         focal_tree = as.factor(tree_id)
+  ) -> clean_dbh_sc
+
+lme4::glmer(formula = cbind(leaves_w_herbivory, (n_leaves_assessed - leaves_w_herbivory)) ~ 
+     connectivity_sc + dbh_sc + (1|tree_id), 
+   data = filter(clean_dbh_sc, is_focal == TRUE), 
+   family = binomial(link = "logit")) -> mod
+
+summary(mod)
+```
+
+No trend here but looks like there is a lot of variability within a single tree.
+
+## Variability in herbivory
+
+Function to calculate the gini index:
+
+```{r}
+get_gini <- function(x, n = rep(1, length(x)) ) {
+  x <- rep(x, n)
+  n <- length(x)
+  x <- sort(x)
+  res <- 2 * sum(x * 1:n) / (n*sum(x)) - 1 - (1/n)
+  res <- n / (n - 1) * res
+
+  return(res)
+
+}
+```
+
+Within tree variability
+
+```{r}
+clean_dbh_sc %>%
+  filter(is_focal == TRUE) %>% 
+  group_by(tree_id) %>%
+  mutate(gini = get_gini(x = leaves_w_herbivory/n_leaves_assessed)) -> gini_data
+
+gini_data %>% 
+  ggplot(aes(y = gini, x = connectivity)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```{r}
+lm(gini ~ scale(connectivity), data = gini_data) -> gini_mod
+
+summary(gini_mod)
+
+```
+
+More connected trees have less variability in herbivory within a single tree.
+More connectivity -> more herbivory events -> low variability in herbivory
+
+Note that in this analysis I have only used focal trees, 
+but we also have data for nearest neighbours and saplings.
+To add these trees to the analysis I'd need to calculate connectivity for these trees independently and do some edge effect mitigation.
