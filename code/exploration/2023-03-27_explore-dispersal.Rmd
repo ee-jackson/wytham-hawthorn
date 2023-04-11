@@ -25,10 +25,10 @@ This has actually given us some nice data on dispersal.
 
 Maybe we can ask questions like:
 
-* did the cages actually work to protect fruits from birds
+* did the cages actually work to protect fruits from birds?
 * are more connected trees / bigger trees better dispersed?
   * are more fruits dispersed?
-  * are fruits dispersed sooner? (does this even have an impact on germination?)
+  * are fruits dispersed sooner? (no impact on germination of early dispersal but could reduce time period when fruit is vulnerable to enemies)
 
 ```{r packages, message=FALSE, warning=FALSE}
 library("tidyverse")
@@ -101,8 +101,8 @@ survey_data_con %>%
   geom_smooth(method = "lm")
 ```
 
-Yes - looks like branches that were protected lost their fruits at a faster rate compared to open branches.
-But is this just a function of the caged branches being recorded earlier..
+Yes - looks like open branches lost their fruits at a faster rate compared to branches that were protected.
+But is this just a function of the caged branches being recorded earlier..?
 
 ```{r}
 survey_data_con %>%
@@ -113,15 +113,63 @@ survey_data_con %>%
   geom_smooth(method = "lm")
 ```
 
-Ok, no it's still steeper! 
-Probably better to report the second one though as it did change the slopes?
+Ok, it's still steeper! 
+Probably better to report the second one though as it was only from that point that I added the exclusions.
+Maybe I should re-calculate the proportion dropped for branches with exclusions with survey 4 as the first time point (total fruits).
+
+```{r}
+survey_data_con %>%
+  filter(survey %in% c(4, 5, 6, 7, 8) ) %>% 
+  group_by(branch_id) %>%
+  # calculate proportions per branch for each time point
+  mutate(max_fruit = max(n_fruit)) %>% 
+  mutate(proportion = n_fruit / max_fruit) %>%
+  ungroup() %>% 
+  # make the first survey count = the max count of fruit per branch
+  mutate(proportion = ifelse(proportion > 1, proportion == 1, proportion)) %>%
+  mutate(proportion = ifelse(survey == 4, 1, proportion)) %>%
+  ggplot(aes(x = survey, y = proportion, 
+             group = exclusion, colour = exclusion)) +
+  geom_jitter() +
+  geom_smooth(method = "lm")
+  
+```
+
+Ok that is also reassuring, and probably the plot we want to go with.
+Even though we aren't presenting all the available data, this makes the two groups comparable.
+Let's make it pretty.
+
+```{r rate-of-dispersal}
+survey_data_con %>%
+  filter(survey %in% c(4, 5, 6, 7, 8) ) %>% 
+  group_by(branch_id) %>%
+  mutate(max_fruit = max(n_fruit)) %>% 
+  mutate(proportion = n_fruit / max_fruit) %>%
+  ungroup() %>% 
+  mutate(proportion = ifelse(proportion > 1, proportion == 1, proportion)) %>%
+  mutate(proportion = ifelse(survey == 4, 1, proportion)) %>%
+  mutate(month = case_when(survey == 4 ~ "October",
+                           survey == 5 ~ "November",
+                           survey == 6 ~ "December",
+                           survey == 7 ~ "January",
+                           survey == 8 ~ "February")) %>% 
+  ggplot(aes(x = reorder(month, survey), y = proportion, 
+             group = exclusion, colour = exclusion, fill = exclusion)) +
+  geom_jitter() +
+  geom_smooth(method = "lm") +
+  xlab("") +
+  ylab("Proportion of fruits remaining") +
+  labs(fill = "Vertebrates\nexcluded", colour = "Vertebrates\nexcluded") +
+  scale_color_manual(values = c("#E69F00", "#56B4E9")) +
+  scale_fill_manual(values = c("#E69F00", "#56B4E9"))
+  
+```
 
 ## Are more connected trees / bigger trees better dispersed?
 
 By the last survey nearly all the fruits were taken from non-protected branches, 
 so I think we have to look at this in terms of how quickly the fruits were taken.
-We could expect to see trees with higher connectivity / dbh having a steeper slope - 
-a stronger relationship between proportion of fruits dispersed and time.
+We could expect to see trees with higher connectivity / dbh having a steeper slope - a stronger relationship between proportion of fruits dispersed and time.
 
 Let's first try plotting it to see if we can eyeball.
 
@@ -145,7 +193,8 @@ survey_data_con %>%
 
 I can't really see any patterns here. 
 Let try and get some numbers out.
-If we run a linear regression we can pull out the coefficients (i.e. a value to describe how steep the slope is). 
+If we run a linear regression we can pull out the coefficients 
+(i.e. a value to describe how steep the slope is). 
 Think I'll do a mixed-effects model to allow the model to borrow information from other trees. 
 We don't have masses of data on the per tree level.
 
@@ -167,6 +216,7 @@ Now that we have the slope values I'm going to try plotting them against connect
 
 ```{r slope-connectivity}
 survey_data_con %>%
+  filter(exclusion == FALSE) %>% 
   select(tree_id, repro_connectivity) %>%
   distinct() %>%
   right_join(coefs) %>%
@@ -178,20 +228,46 @@ survey_data_con %>%
 So this is telling us that trees which are more connected had their berries taken quicker.
 Perhaps birds are more likely to visit areas where there are many reproductive hawthorn.
 
-```{r slope-dbh}
+Testing the relationship with a linear model:
+
+```{r slope-connectivity-mod}
 survey_data_con %>%
-  select(tree_id, dbh) %>%
+  filter(exclusion == FALSE) %>% 
+  select(tree_id, repro_connectivity, dbh) %>%
   distinct() %>%
-  right_join(coefs) %>%
+  right_join(coefs) -> rate_data
+  
+glm(formula = scale(slope) ~ scale(repro_connectivity),
+   data = rate_data) -> rate_connect_mod
+
+summary(rate_connect_mod)
+```
+
+p is not < 0.05, 
+I'm not too surprised since we have few data points at the higher end of connectivity.
+
+Let's look at dbh:
+
+```{r slope-dbh}
+rate_data %>%
   ggplot(aes(x = dbh, y = slope)) + 
   geom_point() + 
   geom_smooth(method = "lm")
 ```
 
-And trees that were larger had their berries taken slower. This would kind of make sense... 
+
+```{r slope-dbh-mod}
+glm(formula = scale(slope) ~ scale(dbh),
+   data = rate_data) -> rate_dbh_mod
+
+summary(rate_dbh_mod)
+```
+
+Trees that were larger had their berries taken slower. This would kind of make sense... 
 if there are more berries on the tree there would be more choice for the birds - 
 less chance they'll take ones that we are monitoring.
 
-However, the trends don't look super convincing to me.
-We could model the coefficients against dbh and connectivity? 
-Is it valid to build a model off of the coefficients of another model?
+However, the trends don't look super convincing to me and they are both non-significant relationships according to the models.
+
+Maybe we need a different connectivity measure for birds anyway because 
+they can travel much further distances than insect predators and pollinators. 
