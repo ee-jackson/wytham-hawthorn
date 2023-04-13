@@ -103,4 +103,29 @@ clean_plots %>%
   ungroup() %>%
   select(- other_d, - split_height) -> largest_stems
 
-saveRDS(largest_stems, file = here::here("data", "clean", "hawthorn_plots.rds"))
+
+# Duplicate dfs for neighbours/Susie's trees ------------------------------
+
+largest_stems %>%
+  drop_na(susie_id) %>%
+  distinct(susie_id, .keep_all = TRUE) %>%
+  select(plot, tree_id, susie_id) %>%
+  rename_with(~ paste0("og_", .x, recycle0 = TRUE)) -> neighbour_list
+
+get_neighbour_dfs <- function(og_plot, og_tree_id, og_susie_id) {
+  largest_stems %>%
+    filter(plot == og_plot) %>%
+    mutate(tree_id = recode(tree_id,
+                           "tree_0" = "tree_f")) %>%
+    mutate(tree_id = case_when(tree_id == og_tree_id ~ "tree_0",
+                               .default = tree_id) ) %>%
+    mutate(plot = og_susie_id)
+}
+
+neighbour_dfs <- pmap(neighbour_list, get_neighbour_dfs)
+
+neighbour_df <- bind_rows(neighbour_dfs)
+
+all_trees <- bind_rows(neighbour_df, largest_stems)
+
+saveRDS(all_trees, file = here::here("data", "clean", "hawthorn_plots.rds"))
