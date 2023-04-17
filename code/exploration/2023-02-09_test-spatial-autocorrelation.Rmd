@@ -19,24 +19,24 @@ library("sf")
 library("ncf")
 library("spdep")
 library("sp")
-  
+library("gridExtra")
 ```
 
-```{r data}
+```{r data-fruit-drop}
+readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>% 
+  filter(exclusion == TRUE) %>% 
+  group_by(tree_id) %>% 
+  summarise(proportion_dropped = median(proportion_dropped)) -> fruit_drop
+
 readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
   filter(tree_id == "tree_0") %>%
   mutate(tree_id = as.numeric(plot)) %>% 
-  left_join(readRDS(here::here("data", "clean", "fruit_drop_data.rds")), 
-            by = "tree_id") %>%
+  inner_join(fruit_drop) %>% 
   sf::st_as_sf(coords = c("latitude", "longitude"), 
-               crs = 4326, remove = FALSE) %>%
-  distinct(tree_id, .keep_all = TRUE) %>%
-  drop_na(proportion_dropped) -> focal_trees
+               crs = 4326, remove = FALSE) -> focal_trees
 
-# Missing mapping data for trees 29 and 23,
-# 34 and 35 were only added for the pollination work,
-# so n = 30
+# n = 31
 
 ```
 
@@ -46,7 +46,7 @@ A correlogram shows the correlation coefficient for the series lagged (in distan
 
 Values close to 1 indicate clustering while values close to -1 indicate dispersion. A random arrangement would give a value that is close to 0.
 
-```{r correlogram}
+```{r correlogram-fruit-drop}
 # using 10 m increments
 plot(ncf::correlog(x = focal_trees$latitude, y = focal_trees$longitude, 
                    z =  focal_trees$proportion_dropped,
@@ -59,13 +59,13 @@ Here, values significant at a nominal (two-sided) 5%-level are represented by fi
 
 ## Moran's I
 
-The expected value of Moran's I under the null hypothesis of no spatial autocorrelation is `-1/(n-1)`, which equals `-0.03448276` for this data. 
+The expected value of Moran's I under the null hypothesis of no spatial autocorrelation is `-1/(n-1)`, which equals `-0.03333333` for this data. 
 
 Values significantly below `-1/(n-1)` indicate negative spatial autocorrelation and values significantly above `-1/(n-1)` indicate positive spatial autocorrelation. 
 
-```{r morans-i}
-# detect nearest neighbours within a 15 km radius (i.e. whole island)
-spdep::dnearneigh(focal_trees$geometry, 0, 15, 
+```{r morans-i-fruit-drop}
+# detect nearest neighbours within a 5 km radius (i.e. whole woodland)
+spdep::dnearneigh(focal_trees$geometry, 0, 5, 
                   row.names = focal_trees$tree_id,  
                   longlat = TRUE) -> nn
 
@@ -85,14 +85,94 @@ A variogram describes the variance of the difference between values at two locat
 
 Here, the x axis represents the distance between traps (km) and each point represents a pair of observations. The distance at which the variogram stops increasing and flattens out is the range. Traps which are closer together than this distance are spatially autocorrelated.
 
-```{r variogram}
-sp::coordinates(focal_trees) = ~latitude+longitude
+```{r variogram-fruit-drop}
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(tree_id = as.numeric(plot)) %>% 
+  inner_join(fruit_drop) -> focal_trees_sp
+  
+sp::coordinates(focal_trees_sp) = ~latitude+longitude
 
 plot(
-    gstat::variogram(proportion_dropped ~ 1, data = focal_trees, 
-        width = 0.001, cutoff = 4000) 
-)
+    gstat::variogram(proportion_dropped ~ 1, data = focal_trees_sp), 
+    xlab = "distance / km", main = "fruit drop"
+) -> p1
 
+p1
 ```
 
 Looks to me like we don't have any spatial autocorrelation - the semivariance is fairly flat and quite random.
+
+# Fruit set
+
+```{r data-fruit-set}
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
+  filter(bagged == FALSE) %>%
+  filter(n_flowers != 0 & n_immature_fruits != 0) %>% 
+  mutate(fruit_set = n_immature_fruits / n_flowers) %>% 
+  group_by(focal_tree) %>% 
+  summarise(fruit_set = median(fruit_set)) -> fruit_set
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(tree_id = as.numeric(plot)) %>% 
+  inner_join(fruit_set, by = c("tree_id" = "focal_tree")) %>% 
+  sf::st_as_sf(coords = c("latitude", "longitude"), 
+               crs = 4326, remove = FALSE) -> fruit_set_trees
+
+# n = 21
+
+```
+
+## Correlogram
+
+```{r correlogram-fruit-set}
+# using 10 m increments
+plot(ncf::correlog(x = fruit_set_trees$latitude, y = fruit_set_trees$longitude, 
+                   z =  fruit_set_trees$fruit_set,
+                   latlon = TRUE, increment = 0.01))
+
+```
+
+## Moran's I
+
+```{r morans-i-fruit-set}
+# detect nearest neighbours within a 5 km radius (i.e. whole woodland)
+spdep::dnearneigh(fruit_set_trees$geometry, 0, 5, 
+                  row.names = fruit_set_trees$tree_id,  
+                  longlat = TRUE) -> nn
+
+# add spatial weights
+lw <- spdep::nb2listw(nn, style = "W", zero.policy = TRUE) 
+
+# Moran's test for spatial autocorrelation
+spdep::moran.test(fruit_set_trees$fruit_set, lw) 
+
+```
+
+## Variogram
+
+```{r variogram-fruit-set}
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(tree_id = as.numeric(plot)) %>% 
+  inner_join(fruit_set, by = c("tree_id" = "focal_tree")) -> fruit_set_trees_sp
+  
+sp::coordinates(fruit_set_trees_sp) = ~latitude+longitude
+
+plot(
+    gstat::variogram(fruit_set ~ 1, data = fruit_set_trees_sp), 
+    xlab = "distance / km", main = "fruit set"
+) -> p2
+
+p2
+```
+
+```{r variogram-both, fig.height=4.5, fig.width=10.5}
+grid.arrange(p1, p2, nrow = 1)
+```
