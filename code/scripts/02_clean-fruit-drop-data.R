@@ -37,7 +37,7 @@ fruit_counts %>%
   mutate(exclusion = ifelse(branch == "d" | branch == "e" | branch == "f",
                             FALSE, TRUE)) %>%
   group_by(branch_id) %>%
-  reframe(across(),
+  reframe(across(everything()),
             length_cm = median(length_cm, na.rm = TRUE)) %>%
   select(- branch, - notes) -> survey_data
 

@@ -61,7 +61,7 @@ calculate_connectivity <- function (data) {
     rename(distance = tree_0) %>%
     filter(distance <= 50) %>%
     mutate(x = exp(- 0.02 * distance ) * dbh^(0.5) ) %>%
-    summarise(connectivity = sum(x),
+    reframe(connectivity = sum(x),
               plot = plot) %>%
     distinct()
 }
