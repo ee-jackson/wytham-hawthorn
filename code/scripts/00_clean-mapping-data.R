@@ -9,26 +9,18 @@
 
 library("tidyverse")
 library("janitor")
-library("googledrive")
 library("here")
 
-# Get data from Google Drive ----------------------------------------------
 
-googledrive::drive_auth(email = "eleanor.elizabeth.j@gmail.com",
-                        scopes = "https://www.googleapis.com/auth/drive")
+# Read data ---------------------------------------------------------------
 
-source(here::here("code", "secrets.R"))
+file_names <- as.list(dir(path = here::here("data", "raw", "mapping"),
+                          pattern = "*.csv", full.names = TRUE))
 
-files <- drive_ls(GDRIVE_FOLDER_URL,
-                  pattern = "^[0-9]{2}.csv")
+data_list <- lapply(file_names, read.csv, na.strings = c("","NA"))
 
-files  %>%
-  mutate(id = sprintf("https://docs.google.com/uc?id=%s&export=download", id)) %>%
-  pull(id) -> urls
+names(data_list) <- lapply(file_names, basename)
 
-names(urls) <- pull(files, name)
-
-data_list <- lapply(urls, read.csv, na.strings = c("","NA"))
 
 # Tidy column names -------------------------------------------------------
 
