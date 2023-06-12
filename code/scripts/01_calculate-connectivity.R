@@ -85,5 +85,5 @@ connectivity_dfs_repro %>%
 
 all_connectivity_dfs_repro %>%
   rename(repro_connectivity = connectivity) %>%
-  left_join(all_connectivity_dfs, by = "plot") %>%
+  full_join(all_connectivity_dfs, by = "plot") %>%
   saveRDS(here::here("data", "clean", "connectivity_data.rds"))
