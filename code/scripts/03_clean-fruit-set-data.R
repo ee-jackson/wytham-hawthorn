@@ -15,6 +15,8 @@ library("tidyverse")
 
 readRDS(here::here("data", "clean", "connectivity_data.rds")) -> connectivity
 
+read.csv(here::here("data", "raw", "fruit_set_2023.csv")) -> fruit_set_2023
+
 clean_raw_data <- function(filename, input_col, output_col) {
   read.csv(here::here("data", "raw", filename),
            header = TRUE, na.strings = c("", "NA")) %>%
@@ -40,33 +42,52 @@ pmap(raw_data_input, clean_raw_data) %>%
     names_from = unit,
     values_from = count
   ) %>%
-  mutate(across(
-    c(n_immature_fruits, n_mature_fruits),
-    ~ case_when(is.na(.) & n_flowers == 0 ~ 0,
-                TRUE ~ .)
-  )) %>%
   mutate(
-    n_flowers = case_when(
-      n_immature_fruits > n_flowers ~ n_immature_fruits,
-      TRUE ~ n_flowers
-    )
-  ) -> all_counts
+    n_flowers = n_flowers - n_damaged_flowers
+  ) %>%
+  filter(n_flowers > 0
+  ) %>%
+  filter(n_immature_fruits < n_flowers
+  ) %>%
+  drop_na() %>%
+  mutate(
+    year = "2022"
+  )  -> all_counts_2022
 
 
 # extract data on if branch was bagged ------------------------------------
 
-read.csv(here::here("data", "raw", "fruit_set_flowers.csv"),
-         header = TRUE, na.strings = c("", "NA")) %>%
+read.csv(
+  here::here("data", "raw", "fruit_set_flowers.csv"),
+  header = TRUE,
+  na.strings = c("", "NA")
+) %>%
   select(tree_id, branch_id, bagged) %>%
   distinct() %>%
-  right_join(all_counts, by = join_by(tree_id, branch_id)) -> all_counts_bag
+  right_join(all_counts_2022, by = join_by(tree_id, branch_id)) %>%
+  select(- n_mature_fruits) -> all_counts_bag
+
+
+# add 2023 data -----------------------------------------------------------
+
+# in 2023 damaged flowers were not included in n_flowers count
+# so we don't have to subtract n_damaged_flowers from n_flowers
+
+fruit_set_2023 %>%
+  mutate(
+    year = "2023",
+    bagged = "FALSE",
+    n_damaged_flowers = n_damaged_flowers + n_galled_flowers
+  ) %>%
+  select(- n_galled_flowers, - notes) %>%
+  drop_na(n_flowers, n_immature_fruits) %>%
+  rbind(all_counts_bag) -> all_yrs_counts
 
 
 # add connectivity data ---------------------------------------------------
 
-all_counts_bag %>%
-  mutate(focal_tree = as.integer(tree_id)) %>%
-  inner_join(connectivity, by = c("focal_tree" = "plot")) %>%
+all_yrs_counts %>%
+  inner_join(connectivity, by = c("tree_id" = "plot")) %>%
   mutate(branch_id = tolower(branch_id)) %>%
   mutate(branch_id = paste0(tree_id, branch_id)) -> all_counts_bag_con
 
@@ -77,7 +98,7 @@ readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   filter(tree_id == "tree_0") %>%
   mutate(plot = as.numeric(plot)) %>%
   select(plot, dbh) %>%
-  inner_join(all_counts_bag_con, by = c("plot" = "focal_tree"),
+  inner_join(all_counts_bag_con, by = c("plot" = "tree_id"),
              multiple = "all") %>%
-  rename(focal_tree = plot) %>%
+  rename(tree_id = plot) %>%
   saveRDS(here::here("data", "clean", "fruit_set_data.rds"))
