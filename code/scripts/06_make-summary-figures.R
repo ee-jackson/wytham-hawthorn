@@ -34,6 +34,8 @@ readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   filter(bagged == FALSE) %>%
   filter(year == 2023) %>%
+  filter(n_flowers != 0) %>%
+  filter(!(tree_id %% 1)) %>%
   group_by(tree_id) %>%
   summarise(sum_flowers = sum(n_flowers, na.rm = TRUE),
             sum_fruits = sum(n_immature_fruits, na.rm = TRUE),
@@ -87,7 +89,7 @@ datasummary(
     )
   ) %>%
   kable_styling(font_size = 16, html_font = "arial") %>%
-  kableExtra::as_image(file = here::here("output", "figures", "summary_stats2.png"),
+  kableExtra::as_image(file = here::here("output", "figures", "summary_stats.png"),
                        width = 4.92)
 
 # for kableExtra::as_image units are in inches

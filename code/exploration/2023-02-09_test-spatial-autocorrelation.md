@@ -87,17 +87,25 @@ lw <- spdep::nb2listw(nn, style = "W", zero.policy = TRUE)
 spdep::moran.test(focal_trees$proportion_dropped, lw) 
 ```
 
+    ## Warning in spdep::moran.test(focal_trees$proportion_dropped, lw): Negative variance,
+    ## distribution of variable does not meet test assumptions
+
+    ## Warning in sqrt(VI): NaNs produced
+
+    ## Warning in spdep::moran.test(focal_trees$proportion_dropped, lw): Out-of-range
+    ## p-value: reconsider test arguments
+
     ## 
     ##  Moran I test under randomisation
     ## 
     ## data:  focal_trees$proportion_dropped  
     ## weights: lw    
     ## 
-    ## Moran I statistic standard deviate = 1.0904e-07, p-value = 0.5
+    ## Moran I statistic standard deviate = NaN, p-value = NA
     ## alternative hypothesis: greater
     ## sample estimates:
     ## Moran I statistic       Expectation          Variance 
-    ##     -3.333333e-02     -3.333333e-02      4.380177e-17
+    ##     -3.225806e-02     -3.225806e-02     -6.353425e-17
 
 Moran’s I is below `-1/(n-1)`, indicating negative spatial correlation,
 but it’s not a significant result.
@@ -143,16 +151,18 @@ semivariance is fairly flat and quite random.
 ``` r
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   filter(bagged == FALSE) %>%
-  filter(n_flowers != 0 & n_immature_fruits != 0) %>% 
+  filter(n_flowers != 0) %>% 
+  filter(!(tree_id %% 1)) %>%
+  filter(year == 2023) %>% 
   mutate(fruit_set = n_immature_fruits / n_flowers) %>% 
-  group_by(focal_tree) %>% 
+  group_by(tree_id) %>% 
   summarise(fruit_set = median(fruit_set)) -> fruit_set
 
 readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
   filter(tree_id == "tree_0") %>%
   mutate(tree_id = as.numeric(plot)) %>% 
-  inner_join(fruit_set, by = c("tree_id" = "focal_tree")) %>% 
+  inner_join(fruit_set, by = c("tree_id" = "tree_id")) %>% 
   sf::st_as_sf(coords = c("latitude", "longitude"), 
                crs = 4326, remove = FALSE) -> fruit_set_trees
 
@@ -210,7 +220,7 @@ spdep::moran.test(fruit_set_trees$fruit_set, lw)
     ## alternative hypothesis: greater
     ## sample estimates:
     ## Moran I statistic       Expectation          Variance 
-    ##     -5.000000e-02     -5.000000e-02     -6.938894e-18
+    ##     -3.225806e-02     -3.225806e-02     -6.006480e-17
 
 ## Variogram
 
@@ -219,7 +229,7 @@ readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
   filter(tree_id == "tree_0") %>%
   mutate(tree_id = as.numeric(plot)) %>% 
-  inner_join(fruit_set, by = c("tree_id" = "focal_tree")) -> fruit_set_trees_sp
+  inner_join(fruit_set, by = c("tree_id" = "tree_id")) -> fruit_set_trees_sp
   
 sp::coordinates(fruit_set_trees_sp) = ~latitude+longitude
 

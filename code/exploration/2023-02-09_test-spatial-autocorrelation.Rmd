@@ -110,16 +110,18 @@ Looks to me like we don't have any spatial autocorrelation - the semivariance is
 ```{r data-fruit-set}
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   filter(bagged == FALSE) %>%
-  filter(n_flowers != 0 & n_immature_fruits != 0) %>% 
+  filter(n_flowers != 0) %>% 
+  filter(!(tree_id %% 1)) %>%
+  filter(year == 2023) %>% 
   mutate(fruit_set = n_immature_fruits / n_flowers) %>% 
-  group_by(focal_tree) %>% 
+  group_by(tree_id) %>% 
   summarise(fruit_set = median(fruit_set)) -> fruit_set
 
 readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
   filter(tree_id == "tree_0") %>%
   mutate(tree_id = as.numeric(plot)) %>% 
-  inner_join(fruit_set, by = c("tree_id" = "focal_tree")) %>% 
+  inner_join(fruit_set, by = c("tree_id" = "tree_id")) %>% 
   sf::st_as_sf(coords = c("latitude", "longitude"), 
                crs = 4326, remove = FALSE) -> fruit_set_trees
 
@@ -161,7 +163,7 @@ readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
   filter(tree_id == "tree_0") %>%
   mutate(tree_id = as.numeric(plot)) %>% 
-  inner_join(fruit_set, by = c("tree_id" = "focal_tree")) -> fruit_set_trees_sp
+  inner_join(fruit_set, by = c("tree_id" = "tree_id")) -> fruit_set_trees_sp
   
 sp::coordinates(fruit_set_trees_sp) = ~latitude+longitude
 

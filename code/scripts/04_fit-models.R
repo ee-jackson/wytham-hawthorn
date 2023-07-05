@@ -28,7 +28,8 @@ readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
 
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   filter(bagged == FALSE) %>%
-  filter(n_flowers != 0 & n_immature_fruits != 0) %>%
+  filter(n_flowers != 0) %>%
+  filter(!(tree_id %% 1)) %>%
   mutate(connectivity_sc = scale(connectivity),
          repro_connectivity_sc = scale(repro_connectivity),
          dbh_sc = scale(dbh),

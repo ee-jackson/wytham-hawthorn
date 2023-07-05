@@ -7,7 +7,6 @@
 
 # packages ----------------------------------------------------------------
 
-
 library("here")
 library("tidyverse")
 library("tidybayes")
@@ -20,7 +19,8 @@ library("patchwork")
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   filter(bagged == FALSE) %>%
   filter(year == 2023) %>%
-  filter(n_flowers != 0 & n_immature_fruits != 0) %>%
+  filter(!(tree_id %% 1)) %>%
+  filter(n_flowers != 0) %>%
   mutate(
     connectivity_sc = scale(connectivity),
     repro_connectivity_sc = scale(repro_connectivity),
@@ -320,7 +320,7 @@ fruit_set_data %>%
 # Combine panels ----------------------------------------------------------
 
 png(
-  here::here("output", "figures", "fruit_set_6_effects_colour_new.png"),
+  here::here("output", "figures", "fruit_set_6_effects_colour.png"),
   width = 1476,
   height = 1800,
   units = "px",
