@@ -157,7 +157,7 @@ fruit_drop_data %>%
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
-  xlab("Diameter at breast height") +
+  xlab("Diameter at breast height /mm") +
   ylab("Proportion of fruits dropped") +
   theme(legend.position = "none") +
   labs(tag = "c") -> p1c
@@ -290,7 +290,7 @@ fruit_drop_data %>%
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
-  xlab("Diameter at breast height") +
+  xlab("Diameter at breast height /mm") +
   ylab("Proportion of fruits dropped") +
   theme(legend.position = "none") +
   labs(tag = "f") -> p1f
