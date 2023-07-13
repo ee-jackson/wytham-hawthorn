@@ -12,8 +12,10 @@ library("here")
 library("tidyverse")
 library("kableExtra")
 library("ggmap")
+library("ggsn")
 library("sf")
 library("modelsummary")
+library("patchwork")
 
 
 # Summarise data ----------------------------------------------------------
@@ -97,11 +99,31 @@ datasummary(
 
 # Make map ----------------------------------------------------------------
 
+# get locations of trees and connectivity
+
 readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   filter(tree_id == "tree_0") %>%
   filter(near(as.numeric(plot), as.integer(as.numeric(plot))) == TRUE) %>%
   filter(plot != "34") %>%
   filter(plot != "35") -> mapping_data
+
+readRDS(here::here("data", "clean", "connectivity_data.rds")) -> conn_dat
+
+mapping_data %>%
+  mutate(plot = as.numeric(plot)) %>%
+  left_join(conn_dat) -> mapping_data_con
+
+mapping_data %>%
+  st_as_sf(coords = c('longitude', 'latitude')) %>%
+  st_set_crs(
+    "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+  ) -> mapping_data_geo
+
+mapping_data_geo %>%
+  mutate(plot = as.numeric(plot)) %>%
+  left_join(conn_dat) -> gg_data
+
+# get a basemap of Wytham woods
 
 bbox <-
   make_bbox(c(
@@ -118,44 +140,60 @@ wytham_basemap <- ggmap::get_map(bbox,
                                  force = TRUE,
                                  source = "stamen",
                                  maptype = "terrain")
-mapping_data %>%
-  st_as_sf(coords = c('longitude', 'latitude')) %>%
-  st_set_crs(
-    "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
-  ) -> mapping_data_geo
 
-st_buffer(mapping_data_geo$geometry, units::as_units(50, "meter")) -> buffs
+# plot trees on Wytham map
 
-png(here::here("output","figures","map.png"),
-    width = 1476, height = 1476, units = "px", bg = "transparent")
-plot(
-  st_transform(buffs, crs = 3857),
-  bgMap = wytham_basemap,
-  col = adjustcolor("#2171b5", .4),
-  border = FALSE, plot = FALSE
-)
-plot(
-  st_geometry(st_centroid(st_transform(buffs, crs = 3857))),
-  pch = 4,
-  cex = 2,
-  col = "black",
-  lwd = 3,
-  add = TRUE
-)
-dev.off()
+ggmap(wytham_basemap) +
+  geom_point(aes(x = longitude, y = latitude,
+                 colour = connectivity, size = dbh),
+             data = mapping_data_con, alpha = 0.9) +
+  scale_colour_viridis_c(option = "D") +
+  ggsn::scalebar(gg_data,
+                 location = "bottomright",
+                 dist = 250,
+                 dist_unit = "m",
+                 transform = TRUE,
+                 st.size = 2.5,
+                 border.size = 0.5,
+                 model = "WGS84") +
+  labs(colour = "Total connectivity") +
+  labs(size = "DBH /mm") +
+  theme_void(base_size = 10) +
+  theme(
+    panel.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"),
+    panel.border = element_rect(colour = "black",
+                                fill = NA,
+                                linewidth = 1)) -> wytham_map
 
-## map with points coloured by connectivity
-#
-# st_buffer(mapping_data_geo$geometry, units::as_units(50, "meter")) -> mapping_data_geo$buffs
-#
-# readRDS(here::here("data", "clean", "connectivity_data.rds")) -> conn_dat
-#
-# mapping_data_geo %>%
-#   mutate(plot = as.numeric(plot)) %>%
-#   left_join(conn_dat) -> gg_data
-#
-# ggplot() +
-#   geom_sf(aes(fill = gg_data$connectivity), data = gg_data$buffs, colour = NA) +
-#   geom_sf(data = gg_data$geometry, shape = 4, colour = "white") +
-#   scale_fill_viridis_c(option = "C") +
-#   theme_classic()
+# get a map of the UK
+
+uk <- c(left = -6.0, bottom = 50, right = 2.5, top = 55)
+
+uk_basemap <- ggmap::get_stamenmap(uk, zoom = 8,
+                                 force = TRUE,
+                                 maptype = "terrain-background")
+
+ggmap(uk_basemap) +
+  geom_point(aes(x = -1.329375, y = 51.769244),
+             size = 4, alpha = 0.6, shape = 4) +
+  theme_void() +
+  theme(
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"),
+        panel.border = element_rect(colour = "black",
+                                    fill = NA,
+                                    linewidth = 1)) -> uk_map
+
+# inset the UK map in the Wytham map
+
+wytham_map + inset_element(uk_map, left = 0.5, bottom = 0.5,
+                           right = 1.05, top = 1,
+                           align_to = "plot")
+
+ggsave(here::here("output","figures","map_new.png"),
+       width = 1476, height = 1000, units = "px")
