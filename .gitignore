@@ -2,6 +2,8 @@
 
 code/exploration/*.html
 
+photos/*
+
 data/*
 !data/raw
 data/raw/*
