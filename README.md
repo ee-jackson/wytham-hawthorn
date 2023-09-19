@@ -1,13 +1,13 @@
 # wytham-hawthorn
 
-This repository contains the [research compendium](https://research-compendium.science) for the Wytham Hawthorn project, lead by Sofia Gripenberg's research group at the University of Reading. The compendium is a collection of all digital parts of the research project to date.
+This repository contains the [research compendium](https://research-compendium.science) for our in-prep manuscript:
 
-We are investigating the roles of plant enemies and mutualists in determining the spatial distribution of Hawthorn (*Crataegus monogyna*) in Wytham Woods.
+Eleanor E. Jackson, Matthew P. Greenwell, James M. Bullock, Tom H. Oliver, Susie Topple, Christopher W. Foster, Sofia Gripenberg. **Density-dependent effects on the reproductive ecology of trees in a temperate woodland.**
 
 ## Contents:
 
 ### [`code/`](code/)
-The [`code/`](code/) directory contains two subdirectories, [`exploration/`](code/exploration/) which contains R Markdown exploratory analyses, and [`scripts/`](code/scripts/) which contains all the code for cleaning, combining, and analysing the data. All paths in the scripts are relative to the root directory (where the `.Rproj` file lives).
+The [`code/`](code/) directory contains two subdirectories, [`exploration/`](code/exploration/) which contains R Markdown exploratory analyses, and [`scripts/`](code/scripts/) which contains all the code for cleaning, combining, and analysing the data.
 
 Each `.R` script has a summary at the top of what it does. The scripts are numbered in the order in which they would typically be run. All `.Rmd` files in [`exploration/`](code/exploration/) are knitted to `github_documents` to make the GitHub repo browsable.
 
@@ -20,7 +20,7 @@ The [`output/`](output/) directory contains the subdirectories [`figures/`](outp
 ### [`docs/`](docs/)
 The [`docs/`](docs/) directory contains the [data dictionary](docs/data-dictionary.md), [project notebook](docs/project-notebook.md) and any other relevant documents.
 
-## To make changes to the project:
+## To contribute to the project:
 -  Fork this repository, so you have your own copy
 -  Make changes
 -  Create a pull request
