@@ -29,7 +29,7 @@ readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
     sum_total = sum(total_fruit, na.rm = TRUE),
     .groups = "rowwise"
   ) %>%
-  mutate(`Proportion of fruit dropped per tree` =
+  mutate(`Proportion of fruits dropped` =
            sum_dropped / sum_total) %>%
   ungroup() -> fruit_drop_plot
 
@@ -42,7 +42,7 @@ readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   summarise(sum_flowers = sum(n_flowers, na.rm = TRUE),
             sum_fruits = sum(n_immature_fruits, na.rm = TRUE),
             .groups = "rowwise") %>%
-  mutate(`Proportion of flowers turning into fruits per tree` =
+  mutate(`Proportion of flowers turning into fruits` =
            sum_fruits / sum_flowers) %>%
   ungroup() %>%
   drop_na() -> fruit_set_plot
@@ -55,13 +55,15 @@ full_join(fruit_set_plot, fruit_drop_plot) -> all_plotting_data
 emptycol <- function(x) " "
 
 tmp_list <- as.list(select(all_plotting_data,
-                           `Proportion of flowers turning into fruits per tree`,
-                           `Proportion of fruit dropped per tree` ))
+                           `Proportion of flowers turning into fruits`,
+                           `Proportion of fruits dropped` ))
 
+Min <- function(x) sprintf("%.2f", min(x, na.rm = TRUE))
+Max <- function(x) sprintf("%.2f", max(x, na.rm = TRUE))
 
 datasummary(
-  `Proportion of flowers turning into fruits per tree` +
-    `Proportion of fruit dropped per tree` ~ Mean + SD + N +
+  `Proportion of flowers turning into fruits` +
+    `Proportion of fruits dropped` ~ Min + Max + Mean + SD +
     Heading("Boxplot") * emptycol +
     Heading("Histogram") * emptycol,
   data = all_plotting_data
@@ -69,28 +71,27 @@ datasummary(
   kable_classic() %>%
   column_spec(column = 1, width = "10em") %>%
   column_spec(
-    column = 5,
+    column = 6,
     image = spec_boxplot(
       tmp_list,
-      width = 700,
+      width = 600,
       height = 300,
-      add_label = TRUE,
-      same_lim = FALSE
+      same_lim = TRUE, res = 400
     )
   ) %>%
   column_spec(
-    column = 6,
+    column = 7,
     image = spec_hist(
       tmp_list,
       breaks = 10,
-      width = 700,
+      width = 600,
       col = "lightgray",
       border = "lightgray",
-      height = 200,
-      same_lim = FALSE
+      height = 300,
+      same_lim = TRUE, res = 400
     )
   ) %>%
-  kable_styling(font_size = 16, html_font = "arial") %>%
+  kable_styling(font_size = 30, html_font = "arial") %>%
   kableExtra::as_image(file = here::here("output", "figures", "summary_stats.png"),
                        width = 4.92)
 
