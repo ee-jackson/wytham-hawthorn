@@ -1,5 +1,17 @@
 # project-notebook
 
+## 2023-09-29
+* SG and MG counted mature (red) fruits on focal trees and collected fruits from nearby trees for insect rearing
+
+## 2023-06-29
+* EJ counted immature (green) fruits on the other half of the focal trees
+
+## 2023-06-26
+* SG counted immature (green) fruits on half of the focal trees
+
+## 2023-05-31
+* SG, EJ and CF counted flowers on focal trees
+
 ## 2023-02-08
 * Haws for germination trial were collected in mid October (100 from each focal tree). They have been at room temp (in Sofia's office) since 2022-11-01 (100 days) and were moved into 5 degree fridge today.
 
