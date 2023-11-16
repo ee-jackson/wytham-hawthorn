@@ -48,6 +48,8 @@ data_list_col_repair$`35.csv` %>%
                        `0` = as.integer(153),
                        `11` = as.integer(0))) -> data_list_col_repair$`23.csv`
 
+data_list_col_repair$`07.csv` %>%
+  mutate(dbh = dbh * 10) -> data_list_col_repair$`07.csv`
 
 # Tidy rows ---------------------------------------------------------------
 

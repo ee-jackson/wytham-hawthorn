@@ -46,7 +46,12 @@ tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
     `Diameter at breast height :\nTotal connectivity`
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
-  ggplot(aes(y = reorder(parameter, abs(value)), x = value)) +
+  mutate(parameter = as.factor(parameter)) %>%
+  mutate(parameter = fct_relevel(parameter,
+                                 "Diameter at breast height :\nTotal connectivity",
+                                 "Diameter at breast height",
+                                 "Total connectivity")) %>%
+  ggplot(aes(y = parameter, x = value)) +
   ggdist::stat_halfeye(
     aes(fill = parameter, slab_alpha = after_stat(-pmax(abs(
       1 - 2 * cdf
@@ -58,7 +63,7 @@ tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
     shape = 21,
     point_fill = "white"
   ) +
-  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) +
   scale_slab_alpha_continuous(guide = "none") +
   theme_classic(base_size = 30) +
   geom_vline(xintercept = 0,
