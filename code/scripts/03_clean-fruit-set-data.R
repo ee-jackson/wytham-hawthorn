@@ -65,7 +65,7 @@ read.csv(
   select(tree_id, branch_id, bagged) %>%
   distinct() %>%
   right_join(all_counts_2022, by = join_by(tree_id, branch_id)) %>%
-  select(- n_mature_fruits) -> all_counts_bag
+  select(- n_mature_fruits) -> all_counts_bag_2022
 
 
 # add 2023 data -----------------------------------------------------------
@@ -81,7 +81,7 @@ fruit_set_2023 %>%
   ) %>%
   select(- n_galled_flowers, - notes) %>%
   drop_na(n_flowers, n_immature_fruits) %>%
-  rbind(all_counts_bag) -> all_yrs_counts
+  rbind(all_counts_bag_2022) -> all_yrs_counts
 
 
 # add connectivity data ---------------------------------------------------
