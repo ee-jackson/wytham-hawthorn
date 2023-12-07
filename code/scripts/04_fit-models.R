@@ -45,9 +45,6 @@ readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
          year = as.factor(year)
   ) -> fruit_set_data
 
-fruit_set_data %>%
-  filter(year == 2023) -> fruit_set_data_2023
-
 
 # Prior -------------------------------------------------------------------
 
@@ -60,8 +57,7 @@ fruit_drop_mod <-
   brm(data = fruit_drop_data,
       family = binomial(link = logit),
       n_dropped | trials(total_fruit) ~
-        repro_connectivity_sc + dbh_sc +
-        repro_connectivity_sc:dbh_sc + (1|tree_id),
+        repro_connectivity_sc + dbh_sc + (1|tree_id),
       prior = bprior,
       iter = 2000,
       warmup = 1000,
@@ -86,8 +82,7 @@ fruit_drop_mod_tot <-
   brm(data = fruit_drop_data,
       family = binomial(link = logit),
       n_dropped | trials(total_fruit) ~
-        connectivity_sc + dbh_sc +
-        connectivity_sc:dbh_sc + (1|tree_id),
+        connectivity_sc + dbh_sc + (1|tree_id),
       prior = bprior,
       iter = 2000,
       warmup = 1000,
@@ -112,8 +107,8 @@ fruit_set_repro_mod <-
   brm(data = fruit_set_data,
       family = binomial(link = logit),
       n_immature_fruits | trials(n_flowers) ~
-        repro_connectivity_sc + dbh_sc + year +
-        repro_connectivity_sc:dbh_sc + (1|tree_id),
+        repro_connectivity_sc + dbh_sc +
+        year + (1|tree_id),
       prior = bprior,
       iter = 2000,
       warmup = 1000,
@@ -124,12 +119,18 @@ fruit_set_repro_mod <-
 
 summary(fruit_set_repro_mod)
 
-bayestestR::describe_posterior(fruit_set_repro_mod,
-                               ci = 0.95,
-                               ci_method = "HDI",
-                               centrality = "median") %>%
+bayestestR::describe_posterior(
+  fruit_set_repro_mod,
+  ci = 0.95,
+  ci_method = "HDI",
+  centrality = "median"
+) %>%
   as.data.frame() %>%
-  write_csv(here::here("output", "results", "fruit_set_repro_describe_posterior.csv"))
+  write_csv(here::here(
+    "output",
+    "results",
+    "fruit_set_repro_describe_posterior.csv"
+  ))
 
 
 # fruit set ~ total connectivity ------------------------------------------
@@ -138,8 +139,8 @@ fruit_set_tot_mod <-
   brm(data = fruit_set_data,
       family = binomial(link = logit),
       n_immature_fruits | trials(n_flowers) ~
-        connectivity_sc + dbh_sc + year +
-        connectivity_sc:dbh_sc + (1|tree_id),
+        connectivity_sc + dbh_sc +
+        year + (1|tree_id),
       prior = bprior,
       iter = 2000,
       warmup = 1000,
@@ -150,12 +151,18 @@ fruit_set_tot_mod <-
 
 summary(fruit_set_tot_mod)
 
-bayestestR::describe_posterior(fruit_set_tot_mod,
-                               ci = 0.95,
-                               ci_method = "HDI",
-                               centrality = "median") %>%
+bayestestR::describe_posterior(
+  fruit_set_tot_mod,
+  ci = 0.95,
+  ci_method = "HDI",
+  centrality = "median"
+) %>%
   as.data.frame() %>%
-  write_csv(here::here("output", "results", "fruit_set_tot_describe_posterior.csv"))
+  write_csv(here::here(
+    "output",
+    "results",
+    "fruit_set_tot_describe_posterior.csv"
+    ))
 
 
 # short fruit drop ~ reproductive connectivity ----------------------------
@@ -164,8 +171,8 @@ fruit_drop_short_mod <-
   brm(data = fruit_drop_data_short,
       family = binomial(link = logit),
       n_dropped | trials(total_fruit) ~
-        repro_connectivity_sc + dbh_sc + year +
-        repro_connectivity_sc:dbh_sc + (1|tree_id),
+        repro_connectivity_sc + dbh_sc +
+        year + (1|tree_id),
       prior = bprior,
       iter = 2000,
       warmup = 1000,
@@ -176,12 +183,18 @@ fruit_drop_short_mod <-
 
 summary(fruit_drop_short_mod)
 
-bayestestR::describe_posterior(fruit_drop_short_mod,
-                               ci = 0.95,
-                               ci_method = "HDI",
-                               centrality = "median") %>%
+bayestestR::describe_posterior(
+  fruit_drop_short_mod,
+  ci = 0.95,
+  ci_method = "HDI",
+  centrality = "median"
+) %>%
   as.data.frame() %>%
-  write_csv(here::here("output", "results", "fruit_drop_short_repro_describe_posterior.csv"))
+  write_csv(here::here(
+    "output",
+    "results",
+    "fruit_drop_short_repro_describe_posterior.csv"
+  ))
 
 
 
@@ -191,8 +204,8 @@ fruit_drop_short_mod_tot <-
   brm(data = fruit_drop_data_short,
       family = binomial(link = logit),
       n_dropped | trials(total_fruit) ~
-        connectivity_sc + dbh_sc + year +
-        connectivity_sc:dbh_sc + (1|tree_id),
+        connectivity_sc + dbh_sc +
+        year + (1|tree_id),
       prior = bprior,
       iter = 2000,
       warmup = 1000,
@@ -203,9 +216,15 @@ fruit_drop_short_mod_tot <-
 
 summary(fruit_drop_short_mod_tot)
 
-bayestestR::describe_posterior(fruit_drop_short_mod_tot,
-                               ci = 0.95,
-                               ci_method = "HDI",
-                               centrality = "median") %>%
+bayestestR::describe_posterior(
+  fruit_drop_short_mod_tot,
+  ci = 0.95,
+  ci_method = "HDI",
+  centrality = "median"
+) %>%
   as.data.frame() %>%
-  write_csv(here::here("output", "results", "fruit_drop_short_tot_describe_posterior.csv"))
+  write_csv(here::here(
+    "output",
+    "results",
+    "fruit_drop_short_tot_describe_posterior.csv"
+  ))
