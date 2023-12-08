@@ -14,6 +14,7 @@ library("patchwork")
 library("stringr")
 library("bayesplot")
 library("bayestestR")
+library("gt")
 
 
 # Get models --------------------------------------------------------------
@@ -24,22 +25,6 @@ file_names <- as.list(dir(path = here::here("output", "models"),
 model_list <- lapply(file_names, readRDS)
 
 names(model_list) <- lapply(file_names, basename)
-
-
-# Posterior predictive checks ---------------------------------------------
-
-plot_pp_check <- function(model) {
-  pp_check(model, ndraws = 50) +
-    ggtitle(str_wrap(formula(model), 60)) +
-    theme_classic(base_size = 5)
-}
-
-plot_list <- lapply(model_list, plot_pp_check)
-
-wrap_plots(plot_list)
-
-ggsave(here::here("output","figures","pp_checks.png"),
-       width = 1476, height = 1000, units = "px")
 
 
 # MCMC diagnostics --------------------------------------------------------
@@ -59,50 +44,107 @@ ggsave(here::here("output","figures","mcmc_checks.png"),
        width = 1961, height = 1500, units = "px")
 
 
-# Check influence of prior information ------------------------------------
+# Posterior predictive checks ---------------------------------------------
 
-prior_predictor <- distribution_normal(n = 50, mean = 0, sd = 1)
-
-prior_intercept <- distribution_student_t(n = 50, df = 3, ncp = 0)
-
-plot_prior_check <- function(model, parameter, prior) {
-  draws_fit <- as_draws_df(model, variable = parameter)
-
-  ggplot() +
-    geom_density(
-      aes(x = draws_fit[[parameter]]),
-      fill = "orange",
-      linewidth = 0
-    ) +
-    geom_density(
-      aes(x = prior),
-      fill = "orange",
-      alpha = 1 / 3,
-      linewidth = 0
-    ) +
-    theme_classic(base_size = 5) +
-    ggtitle(str_wrap(formula(model), 60)) +
-    xlab(parameter)
+plot_pp_check <- function(model) {
+  pp_check(model, ndraws = 50) +
+    labs(x = "Response", y = "Density") +
+    theme_classic(base_size = 15)
 }
 
 
-plot_list_prior_1 <-
-  lapply(model_list[c(1,3)], plot_prior_check, "b_repro_connectivity_sc", prior_predictor)
+# Get posterior param estimates -------------------------------------------
 
-plot_list_prior_2 <-
-  lapply(model_list, plot_prior_check, "b_dbh_sc", prior_predictor)
+get_table <- function(model) {
+  bayestestR::describe_posterior(model,
+                                 ci = 0.95,
+                                 ci_method = "HDI",
+                                 centrality = "median",
+                                 test = FALSE) %>%
+    mutate(across(!Rhat & !Parameter, round, 2)) %>%
+    gt()
+}
 
-plot_list_prior_3 <-
-  lapply(model_list, plot_prior_check, "b_Intercept", prior_intercept)
 
-plot_list_prior_4 <-
-  lapply(model_list[c(2,4)], plot_prior_check, "b_connectivity_sc", prior_predictor)
+# Plot for fruit drop -----------------------------------------------------
 
-append(plot_list_prior_1, plot_list_prior_4) %>%
-  append(plot_list_prior_2) %>%
-  append(plot_list_prior_3) -> plot_list_prior_all
+drop_r_t <- get_table(model_list$fruit_drop_fit.rds)
+gtsave(drop_r_t, here::here("output", "results", "fruit_drop_repro.png"))
+drop_r_t_png <- png::readPNG(here::here("output", "results", "fruit_drop_repro.png"),
+                         native = TRUE)
 
-wrap_plots(plot_list_prior_all, ncol = 2)
+drop_r_pp <- plot_pp_check(model_list$fruit_drop_fit.rds)
 
-ggsave(here::here("output","figures","prior_checks.png"),
-       width = 1476, height = 2000, units = "px")
+drop_t_t <- get_table(model_list$fruit_drop_tot_fit.rds)
+gtsave(drop_t_t, here::here("output", "results", "fruit_drop_total.png"))
+drop_t_t_png <- png::readPNG(here::here("output", "results", "fruit_drop_total.png"),
+                         native = TRUE)
+
+drop_t_pp <- plot_pp_check(model_list$fruit_drop_tot_fit.rds)
+
+((drop_r_pp / drop_r_t_png) | (drop_t_pp / drop_t_t_png)) +
+  plot_annotation(tag_levels = 'a') &
+  theme(plot.tag = element_text(size = 20))
+
+png(
+  here::here("output", "figures", "fruit_drop_si.png"),
+  width = 1000,
+  height = 500,
+  units = "px"
+)
+
+
+# Plot for fruit set ------------------------------------------------------
+
+set_r_t <- get_table(model_list$fruit_set_repro_fit.rds)
+gtsave(set_r_t, here::here("output", "results", "fruit_set_repro.png"))
+set_r_t_png <- png::readPNG(here::here("output", "results", "fruit_set_repro.png"),
+                           native = TRUE)
+
+set_r_pp <- plot_pp_check(model_list$fruit_set_repro_fit.rds)
+
+set_t_t <- get_table(model_list$fruit_set_tot_fit.rds)
+gtsave(set_t_t, here::here("output", "results", "fruit_set_total.png"))
+set_t_t_png <- png::readPNG(here::here("output", "results", "fruit_set_total.png"),
+                           native = TRUE)
+
+set_t_pp <- plot_pp_check(model_list$fruit_set_tot_fit.rds)
+
+((set_r_pp / set_r_t_png) | (set_t_pp / set_t_t_png)) +
+  plot_annotation(tag_levels = 'a') &
+  theme(plot.tag = element_text(size = 20))
+
+png(
+  here::here("output", "figures", "fruit_set_si.png"),
+  width = 1000,
+  height = 500,
+  units = "px"
+)
+
+
+# Plot for short fruit drop -----------------------------------------------
+
+drops_r_t <- get_table(model_list$fruit_drop_short_fit.rds)
+gtsave(drops_r_t, here::here("output", "results", "fruit_drops_repro.png"))
+drops_r_t_png <- png::readPNG(here::here("output", "results", "fruit_drops_repro.png"),
+                            native = TRUE)
+
+drops_r_pp <- plot_pp_check(model_list$fruit_drop_short_fit.rds)
+
+drops_t_t <- get_table(model_list$fruit_drop_short_tot_fit.rds)
+gtsave(drops_t_t, here::here("output", "results", "fruit_drops_total.png"))
+drops_t_t_png <- png::readPNG(here::here("output", "results", "fruit_drops_total.png"),
+                            native = TRUE)
+
+drops_t_pp <- plot_pp_check(model_list$fruit_drop_short_tot_fit.rds)
+
+((drops_r_pp / drops_r_t_png) | (drops_t_pp / drops_t_t_png)) +
+  plot_annotation(tag_levels = 'a') &
+  theme(plot.tag = element_text(size = 20))
+
+png(
+  here::here("output", "figures", "fruit_drop_short_si.png"),
+  width = 1000,
+  height = 500,
+  units = "px"
+)
