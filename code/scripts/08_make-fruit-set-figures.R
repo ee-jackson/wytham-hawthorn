@@ -40,14 +40,12 @@ readRDS(here::here("output", "models",
 tidybayes::tidy_draws(fruit_set_tot_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
-    `Total connectivity` = b_connectivity_sc ,
-    `Diameter at breast height :\nTotal connectivity` = `b_connectivity_sc:dbh_sc`,
+    `Total connectivity` = b_connectivity_sc,
     `Year` = `b_year2023`
   ) %>%
   select(
     `Total connectivity`,
     `Diameter at breast height`,
-    `Diameter at breast height :\nTotal connectivity`,
     `Year`
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
@@ -56,7 +54,6 @@ tidybayes::tidy_draws(fruit_set_tot_mod) %>%
                parameter,
                levels = c(
                  "Year",
-                 "Diameter at breast height :\nTotal connectivity",
                  "Diameter at breast height",
                  "Total connectivity"
                )
@@ -73,7 +70,7 @@ tidybayes::tidy_draws(fruit_set_tot_mod) %>%
     point_fill = "white"
   ) +
   scale_slab_alpha_continuous(guide = "none") +
-  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#0072B2")) +
+  scale_fill_manual(values = c("#E69F00", "#009E73", "#56B4E9")) +
   theme_classic(base_size = 30) +
   geom_vline(xintercept = 0,
              linetype = 2,
@@ -97,8 +94,8 @@ tidybayes::tidy_draws(fruit_set_tot_mod) %>%
 
 # fruit_set_data %>%
 #   modelr::data_grid(
-#     connectivity_sc = modelr::seq_range(connectivity_sc, n = 51),
-#     n_flowers = modelr::seq_range(n_flowers, n = 51),
+#     connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
+#     n_flowers = modelr::seq_range(n_flowers, n = 21),
 #     dbh_sc = rep(mean(fruit_set_data$dbh_sc), 51),
 #     year = rep(as.factor(2022), 51)
 #   ) %>%
@@ -137,9 +134,9 @@ tidybayes::tidy_draws(fruit_set_tot_mod) %>%
 
 fruit_set_data %>%
   modelr::data_grid(
-    connectivity_sc = modelr::seq_range(connectivity_sc, n = 51),
-    n_flowers = modelr::seq_range(n_flowers, n = 51),
-    dbh_sc = rep(mean(fruit_set_data$dbh_sc), 51),
+    connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
+    n_flowers = modelr::seq_range(n_flowers, n = 21),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
     year = rep(as.factor(2023), 51)
   ) %>%
   mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -152,9 +149,9 @@ fruit_set_data %>%
 
 fruit_set_data %>%
   modelr::data_grid(
-    connectivity_sc = modelr::seq_range(connectivity_sc, n = 51),
-    n_flowers = modelr::seq_range(n_flowers, n = 51),
-    dbh_sc = rep(mean(fruit_set_data$dbh_sc), 51),
+    connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
+    n_flowers = modelr::seq_range(n_flowers, n = 21),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
     year = rep(as.factor(2022), 51)
   ) %>%
   mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -165,17 +162,17 @@ fruit_set_data %>%
       attr(fruit_set_data$connectivity_sc, 'scaled:center')
   ) -> t_con_2022
 
-  ggplot() +
 
+  ggplot() +
   stat_lineribbon(data = t_con_2022, aes(
     x = connectivity_us,
     y = .epred / n_flowers
-  ), .width = .95, colour = "#009E73", fill = "#009E73", alpha = 0.5) +
+  ), .width = .95, colour = "#0072B2", fill = "#0072B2", alpha = 0.4) +
 
     stat_lineribbon(data = t_con_2023, aes(
       x = connectivity_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#E69F00", fill = "#E69F00", alpha = 0.5) +
+    ), .width = .95, colour = "#CC79A7", fill = "#CC79A7", alpha = 0.4) +
 
     geom_point(
     data = fruit_set_data,
@@ -189,7 +186,7 @@ fruit_set_data %>%
     alpha = 0.8,
     shape = 16
   ) +
-  scale_colour_manual(values = c("#009E73", "#E69F00")) +
+  scale_colour_manual(values = c("#0072B2", "#CC79A7")) +
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
@@ -202,8 +199,8 @@ fruit_set_data %>%
 
 # fruit_set_data %>%
 #   modelr::data_grid(
-#     dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-#     n_flowers = modelr::seq_range(n_flowers, n = 51),
+#     dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+#     n_flowers = modelr::seq_range(n_flowers, n = 21),
 #     connectivity_sc = rep(mean(fruit_set_data$connectivity_sc), 51)
 #   ) %>%
 #   mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -241,9 +238,9 @@ fruit_set_data %>%
 
   fruit_set_data %>%
     modelr::data_grid(
-      dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-      n_flowers = modelr::seq_range(n_flowers, n = 51),
-      connectivity_sc = rep(mean(fruit_set_data$connectivity_sc), 51),
+      dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+      n_flowers = modelr::seq_range(n_flowers, n = 21),
+      connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
       year = rep(as.factor(2023), 51)
     ) %>%
     mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -257,9 +254,9 @@ fruit_set_data %>%
 
   fruit_set_data %>%
     modelr::data_grid(
-      dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-      n_flowers = modelr::seq_range(n_flowers, n = 51),
-      connectivity_sc = rep(mean(fruit_set_data$connectivity_sc), 51),
+      dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+      n_flowers = modelr::seq_range(n_flowers, n = 21),
+      connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
       year = rep(as.factor(2022), 51)
     ) %>%
     mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -274,12 +271,12 @@ fruit_set_data %>%
     stat_lineribbon(data = t_con_dbh_2022, aes(
       x = dbh_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#009E73", fill = "#009E73", alpha = 0.5) +
+    ), .width = .95, colour = "#0072B2", fill = "#0072B2", alpha = 0.4) +
 
     stat_lineribbon(data = t_con_dbh_2023, aes(
       x = dbh_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#E69F00", fill = "#E69F00", alpha = 0.5) +
+    ), .width = .95, colour = "#CC79A7", fill = "#CC79A7", alpha = 0.4) +
 
     geom_point(
       data = fruit_set_data,
@@ -294,7 +291,7 @@ fruit_set_data %>%
       shape = 16
     ) +
       theme_classic(base_size = 30) +
-    scale_colour_manual(values = c("#009E73", "#E69F00")) +
+    scale_colour_manual(values = c("#0072B2", "#CC79A7")) +
       scale_x_continuous(expand = c(0.01, 0.01)) +
       scale_y_continuous(expand = c(0.005, 0.005)) +
       xlab("Diameter at breast height /mm") +
@@ -308,13 +305,11 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
     `Reproductive connectivity` = b_repro_connectivity_sc ,
-    `Diameter at breast height :\nReproductive connectivity` = `b_repro_connectivity_sc:dbh_sc`,
     `Year` = `b_year2023`
   ) %>%
   select(
     `Reproductive connectivity`,
     `Diameter at breast height`,
-    `Diameter at breast height :\nReproductive connectivity`,
     Year,
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
@@ -322,7 +317,6 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
              y = factor(
                parameter,
                levels = c("Year",
-                 "Diameter at breast height :\nReproductive connectivity",
                  "Diameter at breast height",
                  "Reproductive connectivity"
                )
@@ -339,7 +333,7 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
     point_fill = "white"
   ) +
   scale_slab_alpha_continuous(guide = "none") +
-  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#0072B2")) +
+  scale_fill_manual(values = c("#E69F00", "#009E73", "#56B4E9")) +
   theme_classic(base_size = 30) +
   geom_vline(xintercept = 0,
              linetype = 2,
@@ -363,8 +357,8 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
 
 # fruit_set_data %>%
 #   modelr::data_grid(
-#     repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 51),
-#     n_flowers = modelr::seq_range(n_flowers, n = 51),
+#     repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
+#     n_flowers = modelr::seq_range(n_flowers, n = 21),
 #     dbh_sc = rep(mean(fruit_set_data$dbh_sc), 51)
 #   ) %>%
 #   mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -405,9 +399,9 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
 
   fruit_set_data %>%
     modelr::data_grid(
-      repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 51),
-      n_flowers = modelr::seq_range(n_flowers, n = 51),
-      dbh_sc = rep(mean(fruit_set_data$dbh_sc), 51),
+      repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
+      n_flowers = modelr::seq_range(n_flowers, n = 21),
+      dbh_sc = modelr::seq_range(dbh_sc, n = 21),
       year = rep(as.factor(2022), 51)
     ) %>%
     mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -420,9 +414,9 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
 
   fruit_set_data %>%
     modelr::data_grid(
-      repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 51),
-      n_flowers = modelr::seq_range(n_flowers, n = 51),
-      dbh_sc = rep(mean(fruit_set_data$dbh_sc), 51),
+      repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
+      n_flowers = modelr::seq_range(n_flowers, n = 21),
+      dbh_sc = modelr::seq_range(dbh_sc, n = 21),
       year = rep(as.factor(2023), 51)
     ) %>%
     mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -438,12 +432,12 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
     stat_lineribbon(data = r_con_2022, aes(
       x = repro_connectivity_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#009E73", fill = "#009E73", alpha = 0.5) +
+    ), .width = .95, colour = "#0072B2", fill = "#0072B2", alpha = 0.4) +
 
     stat_lineribbon(data = r_con_2023, aes(
       x = repro_connectivity_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#E69F00", fill = "#E69F00", alpha = 0.5) +
+    ), .width = .95, colour = "#CC79A7", fill = "#CC79A7", alpha = 0.4) +
 
     geom_point(
       data = fruit_set_data,
@@ -457,7 +451,9 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
       alpha = 0.8,
       shape = 16
     ) +
-    scale_colour_manual(values = c("#009E73", "#E69F00")) +
+    annotate(geom = "text", x = 24000, y = 0.88, label = "2022", colour = "#0072B2", size = 13) +
+    annotate(geom = "text", x = 24000, y = 0.80, label = "2023", colour = "#CC79A7", size = 13) +
+    scale_colour_manual(values = c("#0072B2", "#CC79A7")) +
     theme_classic(base_size = 30) +
     scale_x_continuous(expand = c(0.01, 0.01)) +
     scale_y_continuous(expand = c(0.005, 0.005)) +
@@ -470,8 +466,8 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
 
 # fruit_set_data %>%
 #   modelr::data_grid(
-#     dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-#     n_flowers = modelr::seq_range(n_flowers, n = 51),
+#     dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+#     n_flowers = modelr::seq_range(n_flowers, n = 21),
 #     repro_connectivity_sc = rep(mean(fruit_set_data$repro_connectivity_sc), 51)
 #   ) %>%
 #   mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -511,9 +507,9 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
 
 fruit_set_data %>%
   modelr::data_grid(
-    dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-    n_flowers = modelr::seq_range(n_flowers, n = 51),
-    repro_connectivity_sc = rep(mean(fruit_set_data$repro_connectivity_sc), 51),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    n_flowers = modelr::seq_range(n_flowers, n = 21),
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
       year = rep(as.factor(2023), 51)
     ) %>%
     mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -526,9 +522,9 @@ fruit_set_data %>%
 
 fruit_set_data %>%
   modelr::data_grid(
-    dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-    n_flowers = modelr::seq_range(n_flowers, n = 51),
-    repro_connectivity_sc = rep(mean(fruit_set_data$repro_connectivity_sc), 51),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    n_flowers = modelr::seq_range(n_flowers, n = 21),
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
     year = rep(as.factor(2022), 51)
   ) %>%
     mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -543,12 +539,12 @@ ggplot() +
     stat_lineribbon(data = r_con_dbh_2022, aes(
       x = dbh_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#009E73", fill = "#009E73", alpha = 0.5) +
+    ), .width = .95, colour = "#0072B2", fill = "#0072B2", alpha = 0.4) +
 
     stat_lineribbon(data = r_con_dbh_2023, aes(
       x = dbh_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#E69F00", fill = "#E69F00", alpha = 0.5) +
+    ), .width = .95, colour = "#CC79A7", fill = "#CC79A7", alpha = 0.4) +
 
     geom_point(
       data = fruit_set_data,
@@ -563,7 +559,7 @@ ggplot() +
       shape = 16
     ) +
     theme_classic(base_size = 30) +
-    scale_colour_manual(values = c("#009E73", "#E69F00")) +
+    scale_colour_manual(values = c("#0072B2", "#CC79A7")) +
     scale_x_continuous(expand = c(0.01, 0.01)) +
     scale_y_continuous(expand = c(0.005, 0.005)) +
     xlab("Diameter at breast height /mm") +
@@ -574,7 +570,7 @@ ggplot() +
 # Combine panels ----------------------------------------------------------
 
 png(
-  here::here("output", "figures", "fruit_set_effects_new.png"),
+  here::here("output", "figures", "fruit_set_effects_new2.png"),
   width = 1476,
   height = 1800,
   units = "px",

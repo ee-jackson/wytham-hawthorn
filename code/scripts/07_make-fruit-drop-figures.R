@@ -37,18 +37,15 @@ fruit_drop_tot_mod <-
 tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
-    `Total connectivity` = b_connectivity_sc ,
-    `Diameter at breast height :\nTotal connectivity` = `b_connectivity_sc:dbh_sc`
+    `Total connectivity` = b_connectivity_sc
   ) %>%
   select(
     `Diameter at breast height`,
-    `Total connectivity`,
-    `Diameter at breast height :\nTotal connectivity`
+    `Total connectivity`
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
   mutate(parameter = as.factor(parameter)) %>%
   mutate(parameter = fct_relevel(parameter,
-                                 "Diameter at breast height :\nTotal connectivity",
                                  "Diameter at breast height",
                                  "Total connectivity")) %>%
   ggplot(aes(y = parameter, x = value)) +
@@ -63,7 +60,7 @@ tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
     shape = 21,
     point_fill = "white"
   ) +
-  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) +
+  scale_fill_manual(values = c("#E69F00", "#009E73")) +
   scale_slab_alpha_continuous(guide = "none") +
   theme_classic(base_size = 30) +
   geom_vline(xintercept = 0,
@@ -88,9 +85,9 @@ tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
 
 fruit_drop_data %>%
   modelr::data_grid(
-    connectivity_sc = modelr::seq_range(connectivity_sc, n = 51),
-    total_fruit = modelr::seq_range(total_fruit, n = 51),
-    dbh_sc = rep(mean(fruit_drop_data$dbh_sc), 51)
+    connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21)
   ) %>%
   mutate(total_fruit = as.integer(total_fruit)) %>%
   add_epred_draws(fruit_drop_tot_mod, ndraws = 500, re_formula = NA) %>%
@@ -130,9 +127,9 @@ fruit_drop_data %>%
 
 fruit_drop_data %>%
   modelr::data_grid(
-    dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-    total_fruit = modelr::seq_range(total_fruit, n = 51),
-    connectivity_sc = rep(mean(fruit_drop_data$connectivity_sc), 51)
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    connectivity_sc = modelr::seq_range(connectivity_sc, n = 21)
   ) %>%
   mutate(total_fruit = as.integer(total_fruit)) %>%
   add_epred_draws(fruit_drop_tot_mod, ndraws = 500, re_formula = NA) %>%
@@ -173,14 +170,11 @@ fruit_drop_data %>%
 tidybayes::tidy_draws(fruit_drop_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
-    `Reproductive connectivity` = b_repro_connectivity_sc ,
-    `Diameter at breast height :\nReproductive connectivity` =
-      `b_repro_connectivity_sc:dbh_sc`
+    `Reproductive connectivity` = b_repro_connectivity_sc
   ) %>%
   select(
     `Diameter at breast height`,
-    `Reproductive connectivity`,
-    `Diameter at breast height :\nReproductive connectivity`
+    `Reproductive connectivity`
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
   ggplot(aes(y = reorder(parameter, abs(value)), x = value)) +
@@ -196,7 +190,7 @@ tidybayes::tidy_draws(fruit_drop_mod) %>%
     shape = 21,
     point_fill = "white"
   ) +
-  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+  scale_fill_manual(values = c("#E69F00", "#009E73")) +
   scale_slab_alpha_continuous(guide = "none") +
   theme_classic(base_size = 30) +
   geom_vline(xintercept = 0,
@@ -221,9 +215,9 @@ tidybayes::tidy_draws(fruit_drop_mod) %>%
 
 fruit_drop_data %>%
   modelr::data_grid(
-    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 51),
-    total_fruit = modelr::seq_range(total_fruit, n = 51),
-    dbh_sc = rep(mean(fruit_drop_data$dbh_sc), 51)
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21)
   ) %>%
   mutate(total_fruit = as.integer(total_fruit)) %>%
   add_epred_draws(fruit_drop_mod, ndraws = 500, re_formula = NA) %>%
@@ -263,9 +257,9 @@ fruit_drop_data %>%
 
 fruit_drop_data %>%
   modelr::data_grid(
-    dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-    total_fruit = modelr::seq_range(total_fruit, n = 51),
-    repro_connectivity_sc = rep(mean(fruit_drop_data$repro_connectivity_sc), 51)
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21)
   ) %>%
   mutate(total_fruit = as.integer(total_fruit)) %>%
   add_epred_draws(fruit_drop_mod, ndraws = 500, re_formula = NA) %>%
@@ -304,7 +298,7 @@ fruit_drop_data %>%
 # Combine panels ----------------------------------------------------------
 
 png(
-  here::here("output", "figures", "fruit_drop_6_effects_colour.png"),
+  here::here("output", "figures", "fruit_drop_effects_new2.png"),
   width = 1476,
   height = 1800,
   units = "px",
