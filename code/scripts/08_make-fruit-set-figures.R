@@ -172,7 +172,7 @@ fruit_set_data %>%
     stat_lineribbon(data = t_con_2023, aes(
       x = connectivity_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#CC79A7", fill = "#CC79A7", alpha = 0.4) +
+    ), .width = .95, colour = "#56B4E9", fill = "#56B4E9", alpha = 0.4) +
 
     geom_point(
     data = fruit_set_data,
@@ -186,7 +186,7 @@ fruit_set_data %>%
     alpha = 0.8,
     shape = 16
   ) +
-  scale_colour_manual(values = c("#0072B2", "#CC79A7")) +
+  scale_colour_manual(values = c("#0072B2", "#56B4E9")) +
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
@@ -276,7 +276,7 @@ fruit_set_data %>%
     stat_lineribbon(data = t_con_dbh_2023, aes(
       x = dbh_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#CC79A7", fill = "#CC79A7", alpha = 0.4) +
+    ), .width = .95, colour = "#56B4E9", fill = "#56B4E9", alpha = 0.4) +
 
     geom_point(
       data = fruit_set_data,
@@ -291,7 +291,7 @@ fruit_set_data %>%
       shape = 16
     ) +
       theme_classic(base_size = 30) +
-    scale_colour_manual(values = c("#0072B2", "#CC79A7")) +
+    scale_colour_manual(values = c("#0072B2", "#56B4E9")) +
       scale_x_continuous(expand = c(0.01, 0.01)) +
       scale_y_continuous(expand = c(0.005, 0.005)) +
       xlab("Diameter at breast height /mm") +
@@ -437,7 +437,7 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
     stat_lineribbon(data = r_con_2023, aes(
       x = repro_connectivity_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#CC79A7", fill = "#CC79A7", alpha = 0.4) +
+    ), .width = .95, colour = "#56B4E9", fill = "#56B4E9", alpha = 0.4) +
 
     geom_point(
       data = fruit_set_data,
@@ -452,8 +452,8 @@ tidybayes::tidy_draws(fruit_set_repro_mod) %>%
       shape = 16
     ) +
     annotate(geom = "text", x = 24000, y = 0.88, label = "2022", colour = "#0072B2", size = 13) +
-    annotate(geom = "text", x = 24000, y = 0.80, label = "2023", colour = "#CC79A7", size = 13) +
-    scale_colour_manual(values = c("#0072B2", "#CC79A7")) +
+    annotate(geom = "text", x = 24000, y = 0.80, label = "2023", colour = "#56B4E9", size = 13) +
+    scale_colour_manual(values = c("#0072B2", "#56B4E9")) +
     theme_classic(base_size = 30) +
     scale_x_continuous(expand = c(0.01, 0.01)) +
     scale_y_continuous(expand = c(0.005, 0.005)) +
@@ -544,7 +544,7 @@ ggplot() +
     stat_lineribbon(data = r_con_dbh_2023, aes(
       x = dbh_us,
       y = .epred / n_flowers
-    ), .width = .95, colour = "#CC79A7", fill = "#CC79A7", alpha = 0.4) +
+    ), .width = .95, colour = "#56B4E9", fill = "#56B4E9", alpha = 0.4) +
 
     geom_point(
       data = fruit_set_data,
@@ -559,7 +559,7 @@ ggplot() +
       shape = 16
     ) +
     theme_classic(base_size = 30) +
-    scale_colour_manual(values = c("#0072B2", "#CC79A7")) +
+    scale_colour_manual(values = c("#0072B2", "#56B4E9")) +
     scale_x_continuous(expand = c(0.01, 0.01)) +
     scale_y_continuous(expand = c(0.005, 0.005)) +
     xlab("Diameter at breast height /mm") +
@@ -576,6 +576,7 @@ png(
   units = "px",
   type = "cairo"
 )
-(p2a + p2d) / wrap_elements(full = (p2b + p2e)) /  wrap_elements(full = (p2c + p2f)) +
+(p2a + p2d) / wrap_elements(full = (p2b + p2e)) /
+  wrap_elements(full = (p2c + p2f)) +
   plot_layout(heights = c(1, 1.5, 1.5))
 dev.off()
