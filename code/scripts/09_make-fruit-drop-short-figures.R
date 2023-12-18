@@ -36,14 +36,12 @@ readRDS(here::here("output", "models",
 tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
-    `Total connectivity` = b_connectivity_sc ,
-    `Diameter at breast height :\nTotal connectivity` = `b_connectivity_sc:dbh_sc`,
+    `Total connectivity` = b_connectivity_sc,
     `Year` = `b_year2023`
   ) %>%
   select(
     `Total connectivity`,
     `Diameter at breast height`,
-    `Diameter at breast height :\nTotal connectivity`,
     `Year`
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
@@ -52,7 +50,6 @@ tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
                parameter,
                levels = c(
                  "Year",
-                 "Diameter at breast height :\nTotal connectivity",
                  "Diameter at breast height",
                  "Total connectivity"
                )
@@ -69,7 +66,7 @@ tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
     point_fill = "white"
   ) +
   scale_slab_alpha_continuous(guide = "none") +
-  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#0072B2")) +
+  scale_fill_manual(values = c("#E69F00", "#009E73", "#56B4E9")) +
   theme_classic(base_size = 30) +
   geom_vline(xintercept = 0,
              linetype = 2,
@@ -93,9 +90,9 @@ tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
 
 fruit_drop_data %>%
   modelr::data_grid(
-    connectivity_sc = modelr::seq_range(connectivity_sc, n = 51),
-    total_fruit = modelr::seq_range(total_fruit, n = 51),
-    dbh_sc = rep(mean(fruit_drop_data$dbh_sc), 51),
+    connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
     year = rep(as.factor(2023), 51)
   ) %>%
   mutate(total_fruit = as.integer(total_fruit)) %>%
@@ -108,9 +105,9 @@ fruit_drop_data %>%
 
 fruit_drop_data %>%
   modelr::data_grid(
-    connectivity_sc = modelr::seq_range(connectivity_sc, n = 51),
-    total_fruit = modelr::seq_range(total_fruit, n = 51),
-    dbh_sc = rep(mean(fruit_drop_data$dbh_sc), 51),
+    connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
     year = rep(as.factor(2021), 51)
   ) %>%
   mutate(total_fruit = as.integer(total_fruit)) %>%
@@ -119,21 +116,21 @@ fruit_drop_data %>%
     connectivity_us = connectivity_sc *
       attr(fruit_drop_data$connectivity_sc, 'scaled:scale') +
       attr(fruit_drop_data$connectivity_sc, 'scaled:center')
-  ) -> t_con_2022
+  ) -> t_con_2021
 
-  ggplot() +
 
-  stat_lineribbon(data = t_con_2022, aes(
+ggplot() +
+  stat_lineribbon(data = t_con_2021, aes(
     x = connectivity_us,
     y = .epred / total_fruit
-  ), .width = .95, colour = "#009E73", fill = "#009E73", alpha = 0.5) +
+  ), .width = .95, colour = "#0072B2", fill = "#0072B2", alpha = 0.4) +
 
-    stat_lineribbon(data = t_con_2023, aes(
-      x = connectivity_us,
-      y = .epred / total_fruit
-    ), .width = .95, colour = "#E69F00", fill = "#E69F00", alpha = 0.5) +
+  stat_lineribbon(data = t_con_2023, aes(
+    x = connectivity_us,
+    y = .epred / total_fruit
+  ), .width = .95, colour = "#56B4E9", fill = "#56B4E9", alpha = 0.4) +
 
-    geom_point(
+  geom_point(
     data = fruit_drop_data,
     aes(
       x = connectivity,
@@ -145,7 +142,7 @@ fruit_drop_data %>%
     alpha = 0.8,
     shape = 16
   ) +
-  scale_colour_manual(values = c("#009E73", "#E69F00")) +
+  scale_colour_manual(values = c("#0072B2", "#56B4E9")) +
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
@@ -154,70 +151,72 @@ fruit_drop_data %>%
   theme(legend.position = "none") +
   labs(tag = "b") -> p2b
 
+
 # Panel c, DBH total connectivity -----------------------------------------
 
-  fruit_drop_data %>%
-    modelr::data_grid(
-      dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-      total_fruit = modelr::seq_range(total_fruit, n = 51),
-      connectivity_sc = rep(mean(fruit_drop_data$connectivity_sc), 51),
-      year = rep(as.factor(2023), 51)
-    ) %>%
-    mutate(total_fruit = as.integer(total_fruit)) %>%
-    add_epred_draws(fruit_drop_tot_mod, ndraws = 500, re_formula = NA) %>%
-    mutate(
-      dbh_us = dbh_sc *
-        attr(fruit_drop_data$dbh_sc, 'scaled:scale') +
-        attr(fruit_drop_data$dbh_sc, 'scaled:center')
-    ) -> t_con_dbh_2023
+fruit_drop_data %>%
+  modelr::data_grid(
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
+    year = rep(as.factor(2023), 51)
+  ) %>%
+  mutate(total_fruit = as.integer(total_fruit)) %>%
+  add_epred_draws(fruit_drop_tot_mod, ndraws = 500, re_formula = NA) %>%
+  mutate(
+    dbh_us = dbh_sc *
+      attr(fruit_drop_data$dbh_sc, 'scaled:scale') +
+      attr(fruit_drop_data$dbh_sc, 'scaled:center')
+  ) -> t_con_dbh_2023
 
 
-  fruit_drop_data %>%
-    modelr::data_grid(
-      dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-      total_fruit = modelr::seq_range(total_fruit, n = 51),
-      connectivity_sc = rep(mean(fruit_drop_data$connectivity_sc), 51),
-      year = rep(as.factor(2021), 51)
-    ) %>%
-    mutate(total_fruit = as.integer(total_fruit)) %>%
-    add_epred_draws(fruit_drop_tot_mod, ndraws = 500, re_formula = NA) %>%
-    mutate(
-      dbh_us = dbh_sc *
-        attr(fruit_drop_data$dbh_sc, 'scaled:scale') +
-        attr(fruit_drop_data$dbh_sc, 'scaled:center')
-    ) -> t_con_dbh_2022
+fruit_drop_data %>%
+  modelr::data_grid(
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    connectivity_sc = modelr::seq_range(connectivity_sc, n = 21),
+    year = rep(as.factor(2021), 51)
+  ) %>%
+  mutate(total_fruit = as.integer(total_fruit)) %>%
+  add_epred_draws(fruit_drop_tot_mod, ndraws = 500, re_formula = NA) %>%
+  mutate(
+    dbh_us = dbh_sc *
+      attr(fruit_drop_data$dbh_sc, 'scaled:scale') +
+      attr(fruit_drop_data$dbh_sc, 'scaled:center')
+  ) -> t_con_dbh_2021
 
-  ggplot() +
-    stat_lineribbon(data = t_con_dbh_2022, aes(
-      x = dbh_us,
-      y = .epred / total_fruit
-    ), .width = .95, colour = "#009E73", fill = "#009E73", alpha = 0.5) +
+ggplot() +
+  stat_lineribbon(data = t_con_dbh_2021, aes(
+    x = dbh_us,
+    y = .epred / total_fruit
+  ), .width = .95, colour = "#0072B2", fill = "#0072B2", alpha = 0.4) +
 
-    stat_lineribbon(data = t_con_dbh_2023, aes(
-      x = dbh_us,
-      y = .epred / total_fruit
-    ), .width = .95, colour = "#E69F00", fill = "#E69F00", alpha = 0.5) +
+  stat_lineribbon(data = t_con_dbh_2023, aes(
+    x = dbh_us,
+    y = .epred / total_fruit
+  ), .width = .95, colour = "#56B4E9", fill = "#56B4E9", alpha = 0.4) +
 
-    geom_point(
-      data = fruit_drop_data,
-      aes(
-        x = dbh,
-        y = n_dropped / total_fruit,
-        size = total_fruit,
-        colour = year
-      ),
-      inherit.aes = FALSE,
-      alpha = 0.8,
-      shape = 16
-    ) +
-      theme_classic(base_size = 30) +
-    scale_colour_manual(values = c("#009E73", "#E69F00")) +
-      scale_x_continuous(expand = c(0.01, 0.01)) +
-      scale_y_continuous(expand = c(0.005, 0.005)) +
-      xlab("Diameter at breast height /mm") +
-      ylab("Proportion of fruits dropped") +
-      theme(legend.position = "none") +
-      labs(tag = "c") -> p2c
+  geom_point(
+    data = fruit_drop_data,
+    aes(
+      x = dbh,
+      y = n_dropped / total_fruit,
+      size = total_fruit,
+      colour = year
+    ),
+    inherit.aes = FALSE,
+    alpha = 0.8,
+    shape = 16
+  ) +
+  theme_classic(base_size = 30) +
+  scale_colour_manual(values = c("#0072B2", "#56B4E9")) +
+  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_y_continuous(expand = c(0.005, 0.005)) +
+  xlab("Diameter at breast height /mm") +
+  ylab("Proportion of fruits dropped") +
+  theme(legend.position = "none") +
+  labs(tag = "c") -> p2c
+
 
 # Panel d, reproductive connectivity parameter estimates ------------------
 
@@ -225,13 +224,11 @@ tidybayes::tidy_draws(fruit_drop_repro_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
     `Reproductive connectivity` = b_repro_connectivity_sc ,
-    `Diameter at breast height :\nReproductive connectivity` = `b_repro_connectivity_sc:dbh_sc`,
     `Year` = `b_year2023`
   ) %>%
   select(
     `Reproductive connectivity`,
     `Diameter at breast height`,
-    `Diameter at breast height :\nReproductive connectivity`,
     Year,
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
@@ -239,9 +236,8 @@ tidybayes::tidy_draws(fruit_drop_repro_mod) %>%
              y = factor(
                parameter,
                levels = c("Year",
-                 "Diameter at breast height :\nReproductive connectivity",
-                 "Diameter at breast height",
-                 "Reproductive connectivity"
+                          "Diameter at breast height",
+                          "Reproductive connectivity"
                )
              ))) +
   ggdist::stat_halfeye(
@@ -256,7 +252,7 @@ tidybayes::tidy_draws(fruit_drop_repro_mod) %>%
     point_fill = "white"
   ) +
   scale_slab_alpha_continuous(guide = "none") +
-  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#0072B2")) +
+  scale_fill_manual(values = c("#E69F00", "#009E73", "#56B4E9")) +
   theme_classic(base_size = 30) +
   geom_vline(xintercept = 0,
              linetype = 2,
@@ -278,142 +274,149 @@ tidybayes::tidy_draws(fruit_drop_repro_mod) %>%
 
 # Panel e, reproductive connectivity --------------------------------------
 
-  fruit_drop_data %>%
-    modelr::data_grid(
-      repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 51),
-      total_fruit = modelr::seq_range(total_fruit, n = 51),
-      dbh_sc = rep(mean(fruit_drop_data$dbh_sc), 51),
-      year = rep(as.factor(2021), 51)
-    ) %>%
-    mutate(total_fruit = as.integer(total_fruit)) %>%
-    add_epred_draws(fruit_drop_repro_mod, ndraws = 500, re_formula = NA) %>%
-    mutate(
-      repro_connectivity_us = repro_connectivity_sc *
-        attr(fruit_drop_data$repro_connectivity_sc, 'scaled:scale') +
-        attr(fruit_drop_data$repro_connectivity_sc, 'scaled:center')
-    ) -> r_con_2021
+fruit_drop_data %>%
+  modelr::data_grid(
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    year = rep(as.factor(2021), 51)
+  ) %>%
+  mutate(total_fruit = as.integer(total_fruit)) %>%
+  add_epred_draws(fruit_drop_repro_mod, ndraws = 500, re_formula = NA) %>%
+  mutate(
+    repro_connectivity_us = repro_connectivity_sc *
+      attr(fruit_drop_data$repro_connectivity_sc, 'scaled:scale') +
+      attr(fruit_drop_data$repro_connectivity_sc, 'scaled:center')
+  ) -> r_con_2021
 
-  fruit_drop_data %>%
-    modelr::data_grid(
-      repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 51),
-      total_fruit = modelr::seq_range(total_fruit, n = 51),
-      dbh_sc = rep(mean(fruit_drop_data$dbh_sc), 51),
-      year = rep(as.factor(2021), 51)
-    ) %>%
-    mutate(total_fruit = as.integer(total_fruit)) %>%
-    add_epred_draws(fruit_drop_repro_mod, ndraws = 500, re_formula = NA) %>%
-    mutate(
-      repro_connectivity_us = repro_connectivity_sc *
-        attr(fruit_drop_data$repro_connectivity_sc, 'scaled:scale') +
-        attr(fruit_drop_data$repro_connectivity_sc, 'scaled:center')
-    ) -> r_con_2022
+fruit_drop_data %>%
+  modelr::data_grid(
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    year = rep(as.factor(2023), 51)
+  ) %>%
+  mutate(total_fruit = as.integer(total_fruit)) %>%
+  add_epred_draws(fruit_drop_repro_mod, ndraws = 500, re_formula = NA) %>%
+  mutate(
+    repro_connectivity_us = repro_connectivity_sc *
+      attr(fruit_drop_data$repro_connectivity_sc, 'scaled:scale') +
+      attr(fruit_drop_data$repro_connectivity_sc, 'scaled:center')
+  ) -> r_con_2023
 
-  ggplot() +
+ggplot() +
 
-    stat_lineribbon(data = r_con_2022, aes(
-      x = repro_connectivity_us,
-      y = .epred / total_fruit
-    ), .width = .95, colour = "#009E73", fill = "#009E73", alpha = 0.5) +
+  stat_lineribbon(data = r_con_2021, aes(
+    x = repro_connectivity_us,
+    y = .epred / total_fruit
+  ), .width = .95, colour = "#0072B2", fill = "#0072B2", alpha = 0.4) +
 
-    stat_lineribbon(data = r_con_2021, aes(
-      x = repro_connectivity_us,
-      y = .epred / total_fruit
-    ), .width = .95, colour = "#E69F00", fill = "#E69F00", alpha = 0.5) +
+  stat_lineribbon(data = r_con_2023, aes(
+    x = repro_connectivity_us,
+    y = .epred / total_fruit
+  ), .width = .95, colour = "#56B4E9", fill = "#56B4E9", alpha = 0.4) +
 
-    geom_point(
-      data = fruit_drop_data,
-      aes(
-        x = repro_connectivity,
-        y = n_dropped / total_fruit,
-        size = total_fruit,
-        colour = year
-      ),
-      inherit.aes = FALSE,
-      alpha = 0.8,
-      shape = 16
-    ) +
-    scale_colour_manual(values = c("#009E73", "#E69F00")) +
-    theme_classic(base_size = 30) +
-    scale_x_continuous(expand = c(0.01, 0.01)) +
-    scale_y_continuous(expand = c(0.005, 0.005)) +
-    xlab("Reproductive connectivity") +
-    ylab("Proportion of fruits dropped") +
-    theme(legend.position = "none") +
-    labs(tag = "e") -> p2e
+  geom_point(
+    data = fruit_drop_data,
+    aes(
+      x = repro_connectivity,
+      y = n_dropped / total_fruit,
+      size = total_fruit,
+      colour = year
+    ),
+    inherit.aes = FALSE,
+    alpha = 0.8,
+    shape = 16
+  ) +
+  annotate(geom = "text", x = 24000, y = 0.88,
+           label = "2021", colour = "#0072B2", size = 13) +
+  annotate(geom = "text", x = 24000, y = 0.80,
+           label = "2023", colour = "#56B4E9", size = 13) +
+  scale_colour_manual(values = c("#0072B2", "#56B4E9")) +
+  theme_classic(base_size = 30) +
+  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_y_continuous(expand = c(0.005, 0.005)) +
+  xlab("Reproductive connectivity") +
+  ylab("Proportion of fruits dropped") +
+  theme(legend.position = "none") +
+  labs(tag = "e") -> p2e
+
 
 # Panel f, DBH reproductive connectivity ----------------------------------
 
 fruit_drop_data %>%
   modelr::data_grid(
-    dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-    total_fruit = modelr::seq_range(total_fruit, n = 51),
-    repro_connectivity_sc = rep(mean(fruit_drop_data$repro_connectivity_sc), 51),
-      year = rep(as.factor(2023), 51)
-    ) %>%
-    mutate(total_fruit = as.integer(total_fruit)) %>%
-    add_epred_draws(fruit_drop_repro_mod, ndraws = 500, re_formula = NA) %>%
-    mutate(
-      dbh_us = dbh_sc *
-        attr(fruit_drop_data$dbh_sc, 'scaled:scale') +
-        attr(fruit_drop_data$dbh_sc, 'scaled:center')
-    ) -> r_con_dbh_2023
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
+    year = rep(as.factor(2023), 51)
+  ) %>%
+  mutate(total_fruit = as.integer(total_fruit)) %>%
+  add_epred_draws(fruit_drop_repro_mod, ndraws = 500, re_formula = NA) %>%
+  mutate(
+    dbh_us = dbh_sc *
+      attr(fruit_drop_data$dbh_sc, 'scaled:scale') +
+      attr(fruit_drop_data$dbh_sc, 'scaled:center')
+  ) -> r_con_dbh_2023
 
 fruit_drop_data %>%
   modelr::data_grid(
-    dbh_sc = modelr::seq_range(dbh_sc, n = 51),
-    total_fruit = modelr::seq_range(total_fruit, n = 51),
-    repro_connectivity_sc = rep(mean(fruit_drop_data$repro_connectivity_sc), 51),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 21),
+    total_fruit = modelr::seq_range(total_fruit, n = 21),
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 21),
     year = rep(as.factor(2021), 51)
   ) %>%
-    mutate(total_fruit = as.integer(total_fruit)) %>%
-    add_epred_draws(fruit_drop_repro_mod, ndraws = 500, re_formula = NA) %>%
-    mutate(
-      dbh_us = dbh_sc *
-        attr(fruit_drop_data$dbh_sc, 'scaled:scale') +
-        attr(fruit_drop_data$dbh_sc, 'scaled:center')
-    ) -> r_con_dbh_2022
+  mutate(total_fruit = as.integer(total_fruit)) %>%
+  add_epred_draws(fruit_drop_repro_mod, ndraws = 500, re_formula = NA) %>%
+  mutate(
+    dbh_us = dbh_sc *
+      attr(fruit_drop_data$dbh_sc, 'scaled:scale') +
+      attr(fruit_drop_data$dbh_sc, 'scaled:center')
+  ) -> r_con_dbh_2021
 
 ggplot() +
-    stat_lineribbon(data = r_con_dbh_2022, aes(
-      x = dbh_us,
-      y = .epred / total_fruit
-    ), .width = .95, colour = "#009E73", fill = "#009E73", alpha = 0.5) +
+  stat_lineribbon(data = r_con_dbh_2021, aes(
+    x = dbh_us,
+    y = .epred / total_fruit
+  ), .width = .95, colour = "#0072B2", fill = "#0072B2", alpha = 0.4) +
 
-    stat_lineribbon(data = r_con_dbh_2023, aes(
-      x = dbh_us,
-      y = .epred / total_fruit
-    ), .width = .95, colour = "#E69F00", fill = "#E69F00", alpha = 0.5) +
+  stat_lineribbon(data = r_con_dbh_2023, aes(
+    x = dbh_us,
+    y = .epred / total_fruit
+  ), .width = .95, colour = "#56B4E9", fill = "#56B4E9", alpha = 0.4) +
 
-    geom_point(
-      data = fruit_drop_data,
-      aes(
-        x = dbh,
-        y = n_dropped / total_fruit,
-        size = total_fruit,
-        colour = year
-      ),
-      inherit.aes = FALSE,
-      alpha = 0.8,
-      shape = 16
-    ) +
-    theme_classic(base_size = 30) +
-    scale_colour_manual(values = c("#009E73", "#E69F00")) +
-    scale_x_continuous(expand = c(0.01, 0.01)) +
-    scale_y_continuous(expand = c(0.005, 0.005)) +
-    xlab("Diameter at breast height /mm") +
-    ylab("Proportion of fruits dropped") +
-    theme(legend.position = "none") +
-    labs(tag = "f") -> p2f
+  geom_point(
+    data = fruit_drop_data,
+    aes(
+      x = dbh,
+      y = n_dropped / total_fruit,
+      size = total_fruit,
+      colour = year
+    ),
+    inherit.aes = FALSE,
+    alpha = 0.8,
+    shape = 16
+  ) +
+  theme_classic(base_size = 30) +
+  scale_colour_manual(values = c("#0072B2", "#56B4E9")) +
+  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_y_continuous(expand = c(0.005, 0.005)) +
+  xlab("Diameter at breast height /mm") +
+  ylab("Proportion of fruits dropped") +
+  theme(legend.position = "none") +
+  labs(tag = "f") -> p2f
+
 
 # Combine panels ----------------------------------------------------------
 
 png(
-  here::here("output", "figures", "fruit_drop_short_effects.png"),
+  here::here("output", "figures", "fruit_drop_short_effects2.png"),
   width = 1476,
   height = 1800,
   units = "px",
   type = "cairo"
 )
-(p2a + p2d) / wrap_elements(full = (p2b + p2e)) /  wrap_elements(full = (p2c + p2f)) +
+(p2a + p2d) / wrap_elements(full = (p2b + p2e)) /
+  wrap_elements(full = (p2c + p2f)) +
   plot_layout(heights = c(1, 1.5, 1.5))
 dev.off()
