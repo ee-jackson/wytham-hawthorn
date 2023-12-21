@@ -198,3 +198,71 @@ wytham_map + inset_element(uk_map, left = 0.5, bottom = 0.5,
 
 ggsave(here::here("output","figures","map_new.png"),
        width = 1476, height = 1000, units = "px")
+
+
+# compare years -----------------------------------------------------------
+
+readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
+  mutate(
+         tree_id = as.factor(tree_id),
+         year = as.factor(year)
+  ) -> fruit_drop_data_short
+
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
+  mutate(
+         tree_id = as.factor(tree_id),
+         year = as.factor(year)
+  ) -> fruit_set_data
+
+fruit_set_data %>%
+  group_by(year) %>%
+  summarise(median_flowers = median(n_flowers),
+            median_fruit = median(n_immature_fruits)) %>%
+  rename(Flowers = median_flowers, `Immature fruit` = median_fruit) %>%
+  pivot_longer(cols = c(Flowers, `Immature fruit`)) %>%
+  ggplot(aes(y = value, x = year, fill = name)) +
+  geom_bar(position = "stack", stat = "identity") +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
+  ylab("Median count per branch") +
+  xlab("Year") +
+  theme_classic(base_size = 10) +
+  theme(legend.position = "none",
+        panel.grid.major.y = element_line(linewidth = .1,
+                                          colour = "black")) -> p1
+
+
+fruit_drop_data_short %>%
+  mutate(n_mature = total_fruit - n_dropped) %>%
+  group_by(year) %>%
+  summarise(median_mature = median(n_mature),
+            median_immature = median(total_fruit)) %>%
+  rename(`Mature fruit` = median_mature, `Immature fruit` = median_immature) %>%
+  pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
+  add_row(year = factor(2021), name = "Flower", value = 0) %>%
+  ggplot(aes(y = value, x = year, fill = name)) +
+  geom_bar(position = "stack", stat = "identity")+
+  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) +
+  ylab("Median count per branch") +
+  xlab("Year") +
+  theme_classic(base_size = 10) +
+  theme(legend.title = element_blank(),
+        panel.grid.major.y = element_line(linewidth = .1,
+                                          colour = "black")) -> p2
+
+
+p1+p2 + plot_annotation(tag_levels = "a")
+
+ggsave(here::here("output","figures","year_comp.png"),
+       width = 1800, height = 900, units = "px")
+
+
+
+
+fruit_set_data %>%
+  group_by(year) %>%
+  group_split() -> split_fruit_set
+
+split_fruit_set[[1]] %>%
+  inner_join(split_fruit_set[[2]], by = "branch_id",
+             suffix = c("_2022", "_2023")) %>% glimpse()
+## only 22 branches were surveyed for fruit set in both 2022 and 2023
