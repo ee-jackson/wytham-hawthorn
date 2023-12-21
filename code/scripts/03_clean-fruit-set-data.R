@@ -101,4 +101,6 @@ readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   inner_join(all_counts_bag_con, by = c("plot" = "tree_id"),
              multiple = "all") %>%
   rename(tree_id = plot) %>%
+  filter(bagged == FALSE) %>%
+  filter(n_flowers != 0) %>%
   saveRDS(here::here("data", "clean", "fruit_set_data.rds"))

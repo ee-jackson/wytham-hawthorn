@@ -17,10 +17,8 @@ library("patchwork")
 # Get data ----------------------------------------------------------------
 
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
-  filter(bagged == FALSE) %>%
   #filter(year == 2023) %>%
-  filter(!(tree_id %% 1)) %>%
-  filter(n_flowers != 0) %>%
+  #filter(!(tree_id %% 1)) %>%
   mutate(
     connectivity_sc = scale(connectivity),
     repro_connectivity_sc = scale(repro_connectivity),

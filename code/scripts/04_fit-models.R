@@ -19,7 +19,6 @@ options(brms.file_refit = "on_change")
 # Get data ----------------------------------------------------------------
 
 readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
-  filter(exclusion == TRUE) %>%
   mutate(connectivity_sc = scale(connectivity),
          repro_connectivity_sc = scale(repro_connectivity),
          dbh_sc = scale(dbh),
@@ -35,9 +34,7 @@ readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
   ) -> fruit_drop_data_short
 
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
-  filter(bagged == FALSE) %>%
-  filter(n_flowers != 0) %>%
-  filter(!(tree_id %% 1)) %>% #only focal trees
+  #filter(!(tree_id %% 1)) %>% only focal trees
   mutate(connectivity_sc = scale(connectivity),
          repro_connectivity_sc = scale(repro_connectivity),
          dbh_sc = scale(dbh),

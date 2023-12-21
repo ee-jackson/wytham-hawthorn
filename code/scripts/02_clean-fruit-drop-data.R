@@ -54,11 +54,13 @@ fruit_counts_21_22 %>%
             length_cm = median(length_cm, na.rm = TRUE)) %>%
   select(- notes) -> survey_data_21_22
 
-# exclusion cages were added on survey 3
+# exclusion cages were added on survey 3 and counted on these
+# branches for the first time
 
 # summarise ---------------------------------------------------------------
 
 survey_data_21_22 %>%
+  filter(exclusion == TRUE) %>%
   select(- branch) %>%
   group_by(branch_id) %>%
   reframe(across(c(tree_id, exclusion, length_cm)),
@@ -66,7 +68,7 @@ survey_data_21_22 %>%
           min_fruit = min(n_fruit)) %>%
   distinct() %>%
   mutate(n_dropped = total_fruit - min_fruit) %>%
-  select(-min_fruit) -> summary_fruit
+  select(-min_fruit) -> summary_fruit_long
 
 survey_data_21_22 %>%
   filter(survey == 1 | survey == 3) %>%
@@ -90,7 +92,7 @@ readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   mutate(plot = as.numeric(plot)) %>%
   select(plot, dbh) %>%
   distinct() %>%
-  inner_join(summary_fruit, by = c("plot" = "tree_id"),
+  inner_join(summary_fruit_long, by = c("plot" = "tree_id"),
              multiple = "all") %>%
   rename(tree_id = plot) -> summary_fruit_dbh
 

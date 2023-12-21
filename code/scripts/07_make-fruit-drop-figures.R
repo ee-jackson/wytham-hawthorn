@@ -17,7 +17,6 @@ library("patchwork")
 # Get data ----------------------------------------------------------------
 
 readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
-  filter(exclusion == TRUE) %>%
   mutate(
     connectivity_sc = scale(connectivity),
     repro_connectivity_sc = scale(repro_connectivity),
