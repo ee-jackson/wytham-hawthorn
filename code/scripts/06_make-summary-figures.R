@@ -257,12 +257,62 @@ ggsave(here::here("output","figures","year_comp.png"),
 
 
 
+# boxplots ----------------------------------------------------------------
+
 
 fruit_set_data %>%
-  group_by(year) %>%
-  group_split() -> split_fruit_set
+  rename(Flower = n_flowers, `Immature fruit` = n_immature_fruits) %>%
+  pivot_longer(cols = c(Flower, `Immature fruit`)) %>%
+  mutate(name = as.factor(name)) %>%
+  ggplot(aes(y = value, x = year, group = interaction(name, year))) +
+  geom_point(aes(colour = name),
+             position = position_jitterdodge(jitter.width = 0.60),
+             alpha = 0.5, shape = 16, size = 1) +
+  geom_boxplot(width = 0.75,
+               outlier.shape = NA, fill = NA, colour = "black",
+               show.legend = NA) +
+  ylab("Count") +
+  xlab("Year") +
+  theme_classic(base_size = 10) +
+  theme(legend.title = element_blank(),
+        panel.grid.major.y = element_line(linewidth = .1,
+                                          colour = "black")) -> p3
 
-split_fruit_set[[1]] %>%
-  inner_join(split_fruit_set[[2]], by = "branch_id",
-             suffix = c("_2022", "_2023")) %>% glimpse()
-## only 22 branches were surveyed for fruit set in both 2022 and 2023
+
+fruit_drop_data_short %>%
+  mutate(n_mature = total_fruit - n_dropped) %>%
+  rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
+  pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
+  mutate(name = as.factor(name)) %>%
+  ggplot(aes(y = value, x = year, group = interaction(name, year))) +
+  geom_point(aes(colour = name),
+             position = position_jitterdodge(jitter.width = 0.60),
+             alpha = 0.5, shape = 16, size = 1) +
+  geom_boxplot(width = 0.75,
+               outlier.shape = NA, fill = NA, colour = "black",
+               show.legend = NA) +
+  ylab("Count") +
+  xlab("Year") +
+  theme_classic(base_size = 10) +
+  theme(legend.title = element_blank(),
+        panel.grid.major.y = element_line(linewidth = .1,
+                                          colour = "black"))  -> p4
+
+colour_key <- c("Flower" = "#56B4E9",
+                "Immature fruit" = "#E69F00",
+                "Mature fruit" = "#009E73")
+
+p3 + p4 +
+  plot_annotation(tag_levels = "a") +
+  plot_layout(guides = "collect") &
+  scale_colour_manual(drop = FALSE,
+                        values = colour_key,
+                      limits = c("Flower", "Immature fruit","Mature fruit")) &
+  guides(colour = guide_legend(override.aes = list(shape = 16,
+                                                   size = 2,
+                                                   alpha = 1) ))
+
+ggsave(here::here("output","figures","year_comp_box.png"),
+       width = 1800, height = 900, units = "px")
+
+
