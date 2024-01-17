@@ -61,6 +61,39 @@ tmp_list <- as.list(select(all_plotting_data,
 Min <- function(x) sprintf("%.2f", min(x, na.rm = TRUE))
 Max <- function(x) sprintf("%.2f", max(x, na.rm = TRUE))
 
+# make inset plots
+png(here::here("output", "plots","hist_fruit_set.png"),
+    width = 300, height = 200, units = "px", bg = "transparent")
+par(mar = c(2, 2, 1, 2))
+hist(all_plotting_data$`Proportion of flowers turning into fruits`,
+     col = "lightgray", border = NA, main = NA, xlab = NA, ylab = NA,
+     xlim = c(0, 1))
+dev.off()
+
+png(here::here("output", "plots","hist_fruit_drop.png"),
+    width = 300, height = 200, units = "px", bg = "transparent")
+par(mar = c(2, 2, 1, 2))
+hist(all_plotting_data$`Proportion of fruits dropped`,
+     col = "lightgray", border = NA, main = NA, xlab = NA, ylab = NA,
+     xlim = c(0, 1))
+dev.off()
+
+png(here::here("output", "plots","box_fruit_set.png"),
+    width = 300, height = 200, units = "px", bg = "transparent")
+par(mar = c(2, 2, 1, 2))
+boxplot(all_plotting_data$`Proportion of flowers turning into fruits`, frame = FALSE,
+        horizontal = TRUE, col = "lightgray", main = NA, xlab = NA, ylab = NA,
+        ylim = c(0, 1))
+dev.off()
+
+png(here::here("output", "plots","box_fruit_drop.png"),
+    width = 300, height = 200, units = "px", bg = "transparent")
+par(mar = c(2, 2, 1, 2))
+boxplot(all_plotting_data$`Proportion of fruits dropped`, frame = FALSE,
+        horizontal = TRUE, col = "lightgray", main = NA, xlab = NA, ylab = NA,
+        ylim = c(0, 1))
+dev.off()
+
 datasummary(
   `Proportion of flowers turning into fruits` +
     `Proportion of fruits dropped` ~ Min + Max + Mean + SD +
@@ -69,34 +102,23 @@ datasummary(
   data = all_plotting_data
 ) %>%
   kable_classic() %>%
-  column_spec(column = 1, width = "10em") %>%
-  column_spec(
-    column = 6,
-    image = spec_boxplot(
-      tmp_list,
-      width = 600,
-      height = 300,
-      same_lim = TRUE, res = 400
-    )
-  ) %>%
-  column_spec(
-    column = 7,
-    image = spec_hist(
-      tmp_list,
-      breaks = 10,
-      width = 600,
-      col = "lightgray",
-      border = "lightgray",
-      height = 300,
-      same_lim = TRUE, res = 400
-    )
-  ) %>%
+  column_spec(column = 1, width_min = "6em") %>%
+  kableExtra::column_spec(column = 6, image = c(
+    here::here("output", "plots","box_fruit_set.png"),
+    here::here("output", "plots","box_fruit_drop.png"),
+    here::here("output", "plots","box_fruit_drop.png")
+  )) %>%
+  kableExtra::column_spec(column = 7, image = c(
+    here::here("output", "plots","hist_fruit_set.png"),
+    here::here("output", "plots","hist_fruit_drop.png"),
+    here::here("output", "plots","hist_fruit_drop.png")
+  )) %>%
   kable_styling(font_size = 30, html_font = "arial") %>%
-  kableExtra::as_image(file = here::here("output", "figures", "summary_stats.png"),
+  kableExtra::as_image(file = here::here("output", "figures",
+                                         "summary_stats_test.png"),
                        width = 4.92)
 
 # for kableExtra::as_image units are in inches
-
 
 # Make map ----------------------------------------------------------------
 
