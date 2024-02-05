@@ -259,6 +259,13 @@ ggsave(here::here("output","figures","year_comp.png"),
 
 # boxplots ----------------------------------------------------------------
 
+ylabs_fs <- fruit_set_data %>%
+  rename(Flower = n_flowers, `Immature fruit` = n_immature_fruits) %>%
+  pivot_longer(cols = c(Flower, `Immature fruit`)) %>%
+  mutate(name = as.factor(name)) %>%
+  group_by(year) %>%
+  summarise(n = n()) %>%
+  mutate(lab = paste0(year, "\n (n = ", n / 2,")"))
 
 fruit_set_data %>%
   rename(Flower = n_flowers, `Immature fruit` = n_immature_fruits) %>%
@@ -271,6 +278,7 @@ fruit_set_data %>%
   geom_boxplot(width = 0.75,
                outlier.shape = NA, fill = NA, colour = "black",
                show.legend = NA) +
+  scale_x_discrete(breaks = ylabs_fs$year, labels = ylabs_fs$lab) +
   ylab("Count") +
   xlab("Year") +
   theme_classic(base_size = 10) +
@@ -278,6 +286,14 @@ fruit_set_data %>%
         panel.grid.major.y = element_line(linewidth = .1,
                                           colour = "black")) -> p3
 
+ylabs_fd <- fruit_drop_data_short %>%
+  mutate(n_mature = total_fruit - n_dropped) %>%
+  rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
+  pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
+  mutate(name = as.factor(name)) %>%
+  group_by(name, year) %>%
+  summarise(n = n()) %>%
+  mutate(lab = paste0(year, "\n (n = ", round(n / 2),")"))
 
 fruit_drop_data_short %>%
   mutate(n_mature = total_fruit - n_dropped) %>%
@@ -291,6 +307,7 @@ fruit_drop_data_short %>%
   geom_boxplot(width = 0.75,
                outlier.shape = NA, fill = NA, colour = "black",
                show.legend = NA) +
+  scale_x_discrete(breaks = ylabs_fd$year, labels = ylabs_fd$lab) +
   ylab("Count") +
   xlab("Year") +
   theme_classic(base_size = 10) +
