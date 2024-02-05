@@ -36,17 +36,17 @@ fruit_drop_tot_mod <-
 tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
-    `Total connectivity` = b_connectivity_sc
+    `Total conspecific density` = b_connectivity_sc
   ) %>%
   select(
     `Diameter at breast height`,
-    `Total connectivity`
+    `Total conspecific density`
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
   mutate(parameter = as.factor(parameter)) %>%
   mutate(parameter = fct_relevel(parameter,
                                  "Diameter at breast height",
-                                 "Total connectivity")) %>%
+                                 "Total conspecific density")) %>%
   ggplot(aes(y = parameter, x = value)) +
   ggdist::stat_halfeye(
     aes(fill = parameter, slab_alpha = after_stat(-pmax(abs(
@@ -116,7 +116,7 @@ fruit_drop_data %>%
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
-  xlab("Total connectivity") +
+  xlab("Total conspecific density") +
   ylab("Proportion of fruits dropped") +
   theme(legend.position = "none") +
   labs(tag = "b") -> p1b
@@ -169,11 +169,11 @@ fruit_drop_data %>%
 tidybayes::tidy_draws(fruit_drop_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
-    `Reproductive connectivity` = b_repro_connectivity_sc
+    `Reproductive conspecific density` = b_repro_connectivity_sc
   ) %>%
   select(
     `Diameter at breast height`,
-    `Reproductive connectivity`
+    `Reproductive conspecific density`
   ) %>%
   pivot_longer(cols = everything(), names_to = "parameter") %>%
   ggplot(aes(y = reorder(parameter, abs(value)), x = value)) +
@@ -246,7 +246,7 @@ fruit_drop_data %>%
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
-  xlab("Reproductive connectivity") +
+  xlab("Reproductive conspecific density") +
   ylab("Proportion of fruits dropped") +
   theme(legend.position = "none") +
   labs(tag = "e") -> p1e
@@ -297,7 +297,7 @@ fruit_drop_data %>%
 # Combine panels ----------------------------------------------------------
 
 png(
-  here::here("output", "figures", "fruit_drop_effects_new2.png"),
+  here::here("output", "figures", "fruit_drop_effects.png"),
   width = 1476,
   height = 1800,
   units = "px",

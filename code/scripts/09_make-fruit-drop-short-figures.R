@@ -36,11 +36,11 @@ readRDS(here::here("output", "models",
 tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
-    `Total connectivity` = b_connectivity_sc,
+    `Total conspecific density` = b_connectivity_sc,
     `Year` = `b_year2023`
   ) %>%
   select(
-    `Total connectivity`,
+    `Total conspecific density`,
     `Diameter at breast height`,
     `Year`
   ) %>%
@@ -51,7 +51,7 @@ tidybayes::tidy_draws(fruit_drop_tot_mod) %>%
                levels = c(
                  "Year",
                  "Diameter at breast height",
-                 "Total connectivity"
+                 "Total conspecific density"
                )
              ))) +
   ggdist::stat_halfeye(
@@ -146,7 +146,7 @@ ggplot() +
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
-  xlab("Total connectivity") +
+  xlab("Total conspecific density") +
   ylab("Proportion of fruits dropped") +
   theme(legend.position = "none") +
   labs(tag = "b") -> p2b
@@ -223,11 +223,11 @@ ggplot() +
 tidybayes::tidy_draws(fruit_drop_repro_mod) %>%
   rename(
     `Diameter at breast height` = b_dbh_sc,
-    `Reproductive connectivity` = b_repro_connectivity_sc ,
+    `Reproductive conspecific density` = b_repro_connectivity_sc ,
     `Year` = `b_year2023`
   ) %>%
   select(
-    `Reproductive connectivity`,
+    `Reproductive conspecific density`,
     `Diameter at breast height`,
     Year,
   ) %>%
@@ -237,7 +237,7 @@ tidybayes::tidy_draws(fruit_drop_repro_mod) %>%
                parameter,
                levels = c("Year",
                           "Diameter at breast height",
-                          "Reproductive connectivity"
+                          "Reproductive conspecific density"
                )
              ))) +
   ggdist::stat_halfeye(
@@ -336,7 +336,7 @@ ggplot() +
   theme_classic(base_size = 30) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(expand = c(0.005, 0.005)) +
-  xlab("Reproductive connectivity") +
+  xlab("Reproductive conspecific density") +
   ylab("Proportion of fruits dropped") +
   theme(legend.position = "none") +
   labs(tag = "e") -> p2e
@@ -410,7 +410,7 @@ ggplot() +
 # Combine panels ----------------------------------------------------------
 
 png(
-  here::here("output", "figures", "fruit_drop_short_effects2.png"),
+  here::here("output", "figures", "fruit_drop_short_effects.png"),
   width = 1476,
   height = 1800,
   units = "px",
