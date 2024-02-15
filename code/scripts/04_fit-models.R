@@ -19,24 +19,23 @@ options(brms.file_refit = "on_change")
 # Get data ----------------------------------------------------------------
 
 readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
-  mutate(connectivity_sc = scale(connectivity),
-         repro_connectivity_sc = scale(repro_connectivity),
+  mutate(repro_connectivity_sc = scale(repro_connectivity),
+         non_repro_connectivity_sc = scale(non_repro_connectivity),
          dbh_sc = scale(dbh),
          tree_id = as.factor(tree_id)
            ) -> fruit_drop_data
 
 readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
-  mutate(connectivity_sc = scale(connectivity),
-         repro_connectivity_sc = scale(repro_connectivity),
+  mutate(repro_connectivity_sc = scale(repro_connectivity),
+         non_repro_connectivity_sc = scale(non_repro_connectivity),
          dbh_sc = scale(dbh),
          tree_id = as.factor(tree_id),
          year = as.factor(year)
   ) -> fruit_drop_data_short
 
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
-  #filter(!(tree_id %% 1)) %>% only focal trees
-  mutate(connectivity_sc = scale(connectivity),
-         repro_connectivity_sc = scale(repro_connectivity),
+  mutate(repro_connectivity_sc = scale(repro_connectivity),
+         non_repro_connectivity_sc = scale(non_repro_connectivity),
          dbh_sc = scale(dbh),
          tree_id = as.factor(tree_id),
          year = as.factor(year)
@@ -61,7 +60,7 @@ fruit_drop_mod <-
       chains = 4,
       cores = 4,
       seed = 9,
-      file = (here::here("output", "models", "fruit_drop_fit.rds")))
+      file = (here::here("output", "models", "fruit_drop_repro_fit.rds")))
 
 summary(fruit_drop_mod)
 
@@ -73,29 +72,29 @@ bayestestR::describe_posterior(fruit_drop_mod,
   write_csv(here::here("output", "results", "fruit_drop_repro_describe_posterior.csv"))
 
 
-# fruit drop ~ total connectivity -----------------------------------------
+# fruit drop ~ non reproductive -----------------------------------------
 
-fruit_drop_mod_tot <-
+fruit_drop_mod_non <-
   brm(data = fruit_drop_data,
       family = binomial(link = logit),
       n_dropped | trials(total_fruit) ~
-        connectivity_sc + dbh_sc + (1|tree_id),
+        non_repro_connectivity_sc + dbh_sc + (1|tree_id),
       prior = bprior,
       iter = 2000,
       warmup = 1000,
       chains = 4,
       cores = 4,
       seed = 9,
-      file = (here::here("output", "models", "fruit_drop_tot_fit.rds")))
+      file = (here::here("output", "models", "fruit_drop_non_fit.rds")))
 
-summary(fruit_drop_mod_tot)
+summary(fruit_drop_mod_non)
 
-bayestestR::describe_posterior(fruit_drop_mod_tot,
+bayestestR::describe_posterior(fruit_drop_mod_non,
                                ci = 0.95,
                                ci_method = "HDI",
                                centrality = "median") %>%
   as.data.frame() %>%
-  write_csv(here::here("output", "results", "fruit_drop_tot_describe_posterior.csv"))
+  write_csv(here::here("output", "results", "fruit_drop_non_describe_posterior.csv"))
 
 
 # fruit set ~ reproductive connectivity -----------------------------------
@@ -130,13 +129,13 @@ bayestestR::describe_posterior(
   ))
 
 
-# fruit set ~ total connectivity ------------------------------------------
+# fruit set ~ non reproductive ------------------------------------------
 
-fruit_set_tot_mod <-
+fruit_set_non_mod <-
   brm(data = fruit_set_data,
       family = binomial(link = logit),
       n_immature_fruits | trials(n_flowers) ~
-        connectivity_sc + dbh_sc +
+        non_repro_connectivity_sc + dbh_sc +
         year + (1|tree_id),
       prior = bprior,
       iter = 2000,
@@ -144,12 +143,12 @@ fruit_set_tot_mod <-
       chains = 4,
       cores = 4,
       seed = 9,
-      file = (here::here("output", "models", "fruit_set_tot_fit.rds")))
+      file = (here::here("output", "models", "fruit_set_non_fit.rds")))
 
-summary(fruit_set_tot_mod)
+summary(fruit_set_non_mod)
 
 bayestestR::describe_posterior(
-  fruit_set_tot_mod,
+  fruit_set_non_mod,
   ci = 0.95,
   ci_method = "HDI",
   centrality = "median"
@@ -158,8 +157,8 @@ bayestestR::describe_posterior(
   write_csv(here::here(
     "output",
     "results",
-    "fruit_set_tot_describe_posterior.csv"
-    ))
+    "fruit_set_non_describe_posterior.csv"
+  ))
 
 
 # short fruit drop ~ reproductive connectivity ----------------------------
@@ -176,7 +175,7 @@ fruit_drop_short_mod <-
       chains = 4,
       cores = 4,
       seed = 9,
-      file = (here::here("output", "models", "fruit_drop_short_fit.rds")))
+      file = (here::here("output", "models", "fruit_drop_short_repro_fit.rds")))
 
 summary(fruit_drop_short_mod)
 
@@ -194,14 +193,13 @@ bayestestR::describe_posterior(
   ))
 
 
+# short fruit drop ~ non reproductive -----------------------------------
 
-# short fruit drop ~ total connectivity -----------------------------------
-
-fruit_drop_short_mod_tot <-
+fruit_drop_short_mod_non <-
   brm(data = fruit_drop_data_short,
       family = binomial(link = logit),
       n_dropped | trials(total_fruit) ~
-        connectivity_sc + dbh_sc +
+        non_repro_connectivity_sc + dbh_sc +
         year + (1|tree_id),
       prior = bprior,
       iter = 2000,
@@ -209,12 +207,12 @@ fruit_drop_short_mod_tot <-
       chains = 4,
       cores = 4,
       seed = 9,
-      file = (here::here("output", "models", "fruit_drop_short_tot_fit.rds")))
+      file = (here::here("output", "models", "fruit_drop_short_non_fit.rds")))
 
-summary(fruit_drop_short_mod_tot)
+summary(fruit_drop_short_mod_non)
 
 bayestestR::describe_posterior(
-  fruit_drop_short_mod_tot,
+  fruit_drop_short_mod_non,
   ci = 0.95,
   ci_method = "HDI",
   centrality = "median"
@@ -223,5 +221,5 @@ bayestestR::describe_posterior(
   write_csv(here::here(
     "output",
     "results",
-    "fruit_drop_short_tot_describe_posterior.csv"
+    "fruit_drop_short_non_describe_posterior.csv"
   ))
