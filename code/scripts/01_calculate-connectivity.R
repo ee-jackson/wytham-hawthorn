@@ -22,6 +22,10 @@ readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   filter(tree_id == "tree_0" | reproductive == "y") %>%
   group_split(plot) -> plot_dfs_repro
 
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  filter(tree_id == "tree_0" | reproductive == "n") %>%
+  group_split(plot) -> plot_dfs_non_repro
+
 
 # Calculate pairwise distances --------------------------------------------
 
@@ -52,6 +56,12 @@ dist_dfs_repro <- lapply(plot_dfs_repro, calculate_dist)
 dist_dfs_focal_repro <- map(dist_dfs_repro,
                             ~select(.x, plot, tree_id, tree_0, dbh))
 
+# non-reproductive trees only
+dist_dfs_non_repro <- lapply(plot_dfs_non_repro, calculate_dist)
+
+dist_dfs_focal_non_repro <- map(dist_dfs_non_repro,
+                            ~select(.x, plot, tree_id, tree_0, dbh))
+
 
 # Calculate connectivity --------------------------------------------------
 
@@ -78,12 +88,41 @@ connectivity_dfs_repro <- lapply(dist_dfs_focal_repro, calculate_connectivity)
 
 connectivity_dfs_repro %>%
   dplyr::bind_rows() %>%
-  mutate(plot = as.numeric(plot)) -> all_connectivity_dfs_repro
+  mutate(plot = as.numeric(plot)) %>%
+  rename(repro_connectivity = connectivity) -> all_connectivity_dfs_repro
+
+# non-reproductive trees only
+connectivity_dfs_non_repro <- lapply(dist_dfs_focal_non_repro, calculate_connectivity)
+
+connectivity_dfs_non_repro %>%
+  dplyr::bind_rows() %>%
+  mutate(plot = as.numeric(plot)) %>%
+  rename(non_repro_connectivity = connectivity) -> all_connectivity_dfs_non_repro
+
+
+# Calculate distance to neighbours ----------------------------------------
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  mutate(plot = as.numeric(plot)) %>%
+  filter(plot %%1 != 0) %>%
+  filter(tree_id == "tree_0" |
+           tree_id == "tree_f" ) %>%
+  group_split(plot) -> non_focal
+
+lapply(non_focal, calculate_dist) %>%
+  dplyr::bind_rows() %>%
+  filter(tree_f > 0 ) %>%
+  rename(dist_to_focal = tree_f) %>%
+  select(plot, dist_to_focal) %>%
+  filter(dist_to_focal > 6) %>%
+  pull(plot) -> to_drop
 
 
 # Combine and save --------------------------------------------------------
 
 all_connectivity_dfs_repro %>%
-  rename(repro_connectivity = connectivity) %>%
   full_join(all_connectivity_dfs, by = "plot") %>%
+  full_join(all_connectivity_dfs_non_repro, by = "plot") %>%
+  filter(! plot %in% to_drop) %>%
+  mutate(non_repro_connectivity = replace_na(non_repro_connectivity, 0)) %>%
   saveRDS(here::here("data", "clean", "connectivity_data.rds"))
