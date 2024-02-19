@@ -1,0 +1,96 @@
+---
+title: "Conspecific density correlations?"
+author: '`r Sys.getenv("USER")`'
+date: '`r format(Sys.time(), "%d %B, %Y")`' 
+always_allow_html: true
+output: 
+  github_document:
+    keep_html: true
+---
+	
+```{r setup, include = FALSE}
+file_name <- rstudioapi::getSourceEditorContext()$path
+
+knitr::opts_chunk$set(
+  fig.path =
+    paste0("figures/", sub("\\.Rmd$", "", basename(file_name)), "/", sep = "")
+)
+
+ggplot2::theme_set(ggplot2::theme_classic(base_size = 10))
+```
+
+```{r packages, message=FALSE, warning=FALSE}
+library("tidyverse")
+library("here")
+library("ggpubr")
+```
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+  ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
+  geom_point() +
+  ggpubr::stat_cor() +
+  geom_smooth(method = "lm", 
+              colour = "blue") +
+  labs(title = "Fruit set")
+```
+
+without outliers:
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+  ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
+  geom_point() +
+  xlim(0, 5000) +
+  ggpubr::stat_cor() +
+  geom_smooth(method = "lm", 
+              colour = "blue") +
+  labs(title = "Fruit set") 
+```
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
+  ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
+  geom_point() +
+  ggpubr::stat_cor() +
+  geom_smooth(method = "lm", 
+              colour = "blue") +
+  labs(title = "Fruit drop (short)")
+```
+
+without outliers:
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
+  ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
+  geom_point() +
+  xlim(0, 5000) +
+  ggpubr::stat_cor() +
+  geom_smooth(method = "lm", 
+              colour = "blue") +
+  labs(title = "Fruit drop (short)")
+```
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+  ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
+  geom_point() +
+  ggpubr::stat_cor() +
+  geom_smooth(method = "lm", 
+              colour = "blue") +
+  labs(title = "Fruit drop (long)")
+```
+
+
+without outliers:
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+  ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
+  geom_point() +
+  xlim(0, 5000) +
+  ggpubr::stat_cor() +
+  geom_smooth(method = "lm", 
+              colour = "blue") +
+  labs(title = "Fruit drop (long)")
+```
