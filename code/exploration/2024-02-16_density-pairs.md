@@ -1,12 +1,13 @@
 Conspecific density correlations?
 ================
 eleanorjackson
-19 February, 2024
+22 February, 2024
 
 ``` r
 library("tidyverse")
 library("here")
 library("ggpubr")
+library("patchwork")
 ```
 
 ``` r
@@ -16,7 +17,11 @@ readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
   ggpubr::stat_cor() +
   geom_smooth(method = "lm", 
               colour = "blue") +
-  labs(title = "Fruit set")
+  labs(title = "Fruit set",
+       x = "Reproductive conspecific density", 
+       y = "Non-reproductive conspecific density") -> p1
+
+p1
 ```
 
     ## `geom_smooth()` using formula = 'y ~ x'
@@ -53,7 +58,11 @@ readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
   ggpubr::stat_cor() +
   geom_smooth(method = "lm", 
               colour = "blue") +
-  labs(title = "Fruit drop (short)")
+  labs(title = "Fruit drop (short)",
+       x = "Reproductive conspecific density", 
+       y = "Non-reproductive conspecific density") -> p2
+
+p2
 ```
 
     ## `geom_smooth()` using formula = 'y ~ x'
@@ -90,7 +99,11 @@ readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
   ggpubr::stat_cor() +
   geom_smooth(method = "lm", 
               colour = "blue") +
-  labs(title = "Fruit drop (long)")
+  labs(title = "Fruit drop (long)",
+       x = "Reproductive conspecific density", 
+       y = "Non-reproductive conspecific density") -> p3
+
+p3
 ```
 
     ## `geom_smooth()` using formula = 'y ~ x'
@@ -119,3 +132,18 @@ readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
     ## Warning: Removed 12 rows containing missing values (`geom_point()`).
 
 ![](figures/2024-02-16_density-pairs/unnamed-chunk-6-1.png)<!-- -->
+
+Correlation coefficients of less than 0.2 are usually classed as “very
+weak to no correlation”.
+
+``` r
+p1 / p2 / p3 +
+  labs(x = "Reproductive conspecific density", 
+       y = "Non-reproductive conspecific density")
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+    ## `geom_smooth()` using formula = 'y ~ x'
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](figures/2024-02-16_density-pairs/unnamed-chunk-7-1.png)<!-- -->
