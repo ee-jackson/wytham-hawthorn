@@ -1,7 +1,7 @@
 Conspecific density correlations?
 ================
 eleanorjackson
-22 February, 2024
+27 February, 2024
 
 ``` r
 library("tidyverse")
@@ -11,7 +11,7 @@ library("patchwork")
 ```
 
 ``` r
-readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
   geom_point() +
   ggpubr::stat_cor() +
@@ -31,7 +31,7 @@ p1
 without outliers:
 
 ``` r
-readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
   geom_point() +
   xlim(0, 5000) +
@@ -41,13 +41,13 @@ readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
   labs(title = "Fruit set") 
 ```
 
-    ## Warning: Removed 12 rows containing non-finite values (`stat_cor()`).
+    ## Warning: Removed 15 rows containing non-finite values (`stat_cor()`).
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
-    ## Warning: Removed 12 rows containing non-finite values (`stat_smooth()`).
+    ## Warning: Removed 15 rows containing non-finite values (`stat_smooth()`).
 
-    ## Warning: Removed 12 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 15 rows containing missing values (`geom_point()`).
 
 ![](figures/2024-02-16_density-pairs/unnamed-chunk-2-1.png)<!-- -->
 
@@ -137,9 +137,8 @@ Correlation coefficients of less than 0.2 are usually classed as “very
 weak to no correlation”.
 
 ``` r
-p1 / p2 / p3 +
-  labs(x = "Reproductive conspecific density", 
-       y = "Non-reproductive conspecific density")
+p1 + p2 + p3 &
+  theme_classic(base_size = 15)
 ```
 
     ## `geom_smooth()` using formula = 'y ~ x'

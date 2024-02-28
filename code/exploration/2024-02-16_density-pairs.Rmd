@@ -27,7 +27,7 @@ library("patchwork")
 ```
 
 ```{r}
-readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
   geom_point() +
   ggpubr::stat_cor() +
@@ -43,7 +43,7 @@ p1
 without outliers:
 
 ```{r}
-readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
   geom_point() +
   xlim(0, 5000) +
@@ -112,9 +112,8 @@ readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
 Correlation coefficients of less than 0.2 are usually classed as
 "very weak to no correlation".
 
-```{r fig.height=12, fig.width=5}
-p1 / p2 / p3 +
-  labs(x = "Reproductive conspecific density", 
-       y = "Non-reproductive conspecific density")
+```{r fig.height=5, fig.width=15}
+p1 + p2 + p3 &
+  theme_classic(base_size = 15)
 ```
 
