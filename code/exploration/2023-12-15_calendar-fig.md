@@ -1,7 +1,7 @@
 Make survey calendar figure
 ================
 eleanorjackson
-18 December, 2023
+28 February, 2024
 
 ``` r
 library("tidyverse")
@@ -98,25 +98,29 @@ ggplot(survey_segs,
 
 ``` r
 survey_segs_2 <- tibble(
-  year = factor(c(2022, 2023, 2023, 2021, 2021)),
-  start = as.Date(c("2023-05-09", "2023-05-31", "2023-06-26", "2023-08-05", 
-                    "2023-01-01"), format = "%Y-%m-%d"),
-  end = as.Date(c("2023-06-17", "2023-06-29", "2023-09-29", "2023-12-31", 
-                  "2023-03-07"), format = "%Y-%m-%d"),
-  type = c(13, 14, 15, 12, 12))
+  year = factor(c(2022, 2023, 2021)),
+  start = as.Date(c("2023-05-09", "2023-05-31", "2023-08-05" 
+                    ), format = "%Y-%m-%d"),
+  end = as.Date(c("2023-06-17", "2023-09-29", 
+                  "2024-03-07"), format = "%Y-%m-%d"),
+  type = c(13, 14, 12))
 ```
 
 ``` r
+pal <- viridisLite::viridis(n = 3, begin = 0.2, end = 0.8, option = "mako")
+names(pal) <- c("2021", "2022", "2023")
+
 ggplot(survey_segs_2, 
        aes(x = start, xend = end, y = type, yend = type, 
            colour = year, group = year)) +
   geom_segment(linewidth = 2, lineend = "round") +
-  coord_polar(start = -89.5) +
-  ylim(5, 15) +
+  coord_polar(start = 180) +
   scale_x_date(date_breaks = "1 month",  expand = c(0,0),
                date_labels = "%b",
                limits = as.Date(c("2023-01-01", "2024-12-31"))) +
-  scale_color_manual(values = c("#fde725", "#21918c", "#440154"))
+  scale_color_manual(values = pal) +
+  theme(panel.grid.major.y = element_line(linetype = 2)) +
+  scale_y_continuous(breaks = c(12, 13, 14), limits = c(5, 14))
 ```
 
 ![](figures/2023-12-15_calendar-fig/unnamed-chunk-10-1.png)<!-- -->
@@ -133,12 +137,12 @@ ggplot(survey_segs_2,
        aes(x = start, xend = end, y = type, yend = type, 
            colour = year, group = year)) +
   geom_segment(linewidth = 5, lineend = "round") +
-  coord_polar(start = -89.5) +
+  coord_polar(start = 180) +
   ylim(5, 15) +
   scale_x_date(date_breaks = "1 month",  expand = c(0,0),
                date_labels = "%b",
                limits = as.Date(c("2023-01-01", "2024-12-31"))) +
-  scale_color_manual(values = c("#fde725", "#21918c", "#440154")) +
+  scale_color_manual(values = pal) +
   theme_classic(base_size = 35)
 dev.off()
 ```
