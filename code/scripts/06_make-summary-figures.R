@@ -101,28 +101,36 @@ datasummary(
 # Make map ----------------------------------------------------------------
 
 # get locations of trees and connectivity
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
+  select(tree_id, connectivity, dbh) %>%
+  unique() -> fruit_set_trees
+
+readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+  select(tree_id, connectivity, dbh) %>%
+  unique() -> fruit_drop_trees
+
+readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
+  select(tree_id, connectivity, dbh) %>%
+  unique() -> fruit_drop_short_trees
 
 readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   filter(tree_id == "tree_0") %>%
-  filter(near(as.numeric(plot), as.integer(as.numeric(plot))) == TRUE) %>%
-  filter(plot != "34") %>%
-  filter(plot != "35") -> mapping_data
+  select(plot, longitude, latitude) %>%
+  mutate(plot = as.numeric(plot)) -> tree_loc
 
-readRDS(here::here("data", "clean", "connectivity_data.rds")) -> conn_dat
-
-mapping_data %>%
-  mutate(plot = as.numeric(plot)) %>%
-  left_join(conn_dat) -> mapping_data_con
+bind_rows(fruit_set_trees, fruit_drop_trees, fruit_drop_short_trees) %>%
+  distinct() %>%
+  left_join(tree_loc, by = c("tree_id" = "plot")) %>%
+  filter(tree_id != 11.1) %>%
+  filter(tree_id != 24.1) %>%
+  filter(tree_id != 34) %>%
+  filter(tree_id != 35)-> mapping_data
 
 mapping_data %>%
   st_as_sf(coords = c('longitude', 'latitude')) %>%
   st_set_crs(
     "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
-  ) -> mapping_data_geo
-
-mapping_data_geo %>%
-  mutate(plot = as.numeric(plot)) %>%
-  left_join(conn_dat) -> gg_data
+  ) -> gg_data
 
 # get a basemap of Wytham woods
 
@@ -137,17 +145,17 @@ bbox <-
   ))
 
 
-wytham_basemap <- ggmap::get_map(bbox,
+wytham_basemap <- ggmap::get_map(bbox, zoom = 17,
                                  force = TRUE,
-                                 source = "stamen",
-                                 maptype = "terrain")
+                                 source = "stadia",
+                                 maptype = "stamen_terrain")
 
 # plot trees on Wytham map
 
 ggmap(wytham_basemap) +
   geom_point(aes(x = longitude, y = latitude,
                  colour = connectivity, size = dbh),
-             data = mapping_data_con, alpha = 0.9) +
+             data = mapping_data, alpha = 0.7, shape = 16) +
   scale_colour_viridis_c(option = "D") +
   ggsn::scalebar(gg_data,
                  location = "bottomright",
@@ -157,7 +165,7 @@ ggmap(wytham_basemap) +
                  st.size = 2.5,
                  border.size = 0.5,
                  model = "WGS84") +
-  labs(colour = "Total connectivity") +
+  labs(colour = "Conspecific density") +
   labs(size = "DBH /mm") +
   theme_void(base_size = 10) +
   theme(
@@ -173,9 +181,10 @@ ggmap(wytham_basemap) +
 
 uk <- c(left = -6.0, bottom = 50, right = 2.5, top = 55)
 
-uk_basemap <- ggmap::get_stamenmap(uk, zoom = 8,
+uk_basemap <- ggmap::get_map(uk, zoom = 8,
                                  force = TRUE,
-                                 maptype = "terrain-background")
+                                 source = "stadia",
+                                 maptype = "stamen_terrain_background")
 
 ggmap(uk_basemap) +
   geom_point(aes(x = -1.329375, y = 51.769244),
@@ -196,7 +205,7 @@ wytham_map + inset_element(uk_map, left = 0.5, bottom = 0.5,
                            right = 1.05, top = 1,
                            align_to = "plot")
 
-ggsave(here::here("output","figures","map_new.png"),
+ggsave(here::here("output","figures","map.png"),
        width = 1476, height = 1000, units = "px")
 
 
@@ -214,6 +223,23 @@ readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
          year = as.factor(year)
   ) -> fruit_set_data
 
+ylabs_fs <- fruit_set_data %>%
+  rename(Flower = n_flowers, `Immature fruit` = n_immature_fruits) %>%
+  pivot_longer(cols = c(Flower, `Immature fruit`)) %>%
+  mutate(name = as.factor(name)) %>%
+  group_by(year) %>%
+  summarise(n = n()) %>%
+  mutate(lab = paste0(year, "\n (n = ", n / 2,")"))
+
+ylabs_fd <- fruit_drop_data_short %>%
+  mutate(n_mature = total_fruit - n_dropped) %>%
+  rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
+  pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
+  mutate(name = as.factor(name)) %>%
+  group_by(name, year) %>%
+  summarise(n = n()) %>%
+  mutate(lab = paste0(year, "\n (n = ", round(n / 2),")"))
+
 fruit_set_data %>%
   group_by(year) %>%
   summarise(median_flowers = median(n_flowers),
@@ -223,6 +249,7 @@ fruit_set_data %>%
   ggplot(aes(y = value, x = year, fill = name)) +
   geom_bar(position = "stack", stat = "identity") +
   scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
+  scale_x_discrete(breaks = ylabs_fs$year, labels = ylabs_fs$lab) +
   ylab("Median count per branch") +
   xlab("Year") +
   theme_classic(base_size = 10) +
@@ -242,6 +269,7 @@ fruit_drop_data_short %>%
   ggplot(aes(y = value, x = year, fill = name)) +
   geom_bar(position = "stack", stat = "identity")+
   scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) +
+  scale_x_discrete(breaks = ylabs_fd$year, labels = ylabs_fd$lab) +
   ylab("Median count per branch") +
   xlab("Year") +
   theme_classic(base_size = 10) +
@@ -256,16 +284,65 @@ ggsave(here::here("output","figures","year_comp.png"),
        width = 1800, height = 900, units = "px")
 
 
+# proportional bars -------------------------------------------------------
 
-# boxplots ----------------------------------------------------------------
-
-ylabs_fs <- fruit_set_data %>%
+ylabs_flowers <- fruit_set_data %>%
   rename(Flower = n_flowers, `Immature fruit` = n_immature_fruits) %>%
   pivot_longer(cols = c(Flower, `Immature fruit`)) %>%
   mutate(name = as.factor(name)) %>%
+  filter(name == "Flower") %>%
   group_by(year) %>%
-  summarise(n = n()) %>%
-  mutate(lab = paste0(year, "\n (n = ", n / 2,")"))
+  summarise(n = sum(value)) %>%
+  mutate(lab = paste0(year, "\n (n = ", n,")"))
+
+fruit_set_data %>%
+  group_by(year) %>%
+  rename(Flowers = n_flowers, `Immature fruit` = n_immature_fruits) %>%
+  pivot_longer(cols = c(Flowers, `Immature fruit`)) %>%
+  ggplot(aes(x = year, y = value, fill = name)) +
+  geom_col(position = "fill") +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
+  ylab("Proportion") +
+  xlab("Year") +
+  theme_classic(base_size = 10) +
+  scale_x_discrete(breaks = ylabs_flowers$year, labels = ylabs_flowers$lab) +
+  theme(legend.position = "none",
+        panel.grid.major.y = element_line(linewidth = .1,
+                                          colour = "black")) -> p5
+
+ylabs_fruits <- fruit_drop_data_short %>%
+  mutate(n_mature = total_fruit - n_dropped) %>%
+  rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
+  pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
+  mutate(name = as.factor(name)) %>%
+  filter(name == "Immature fruit") %>%
+  group_by(year) %>%
+  summarise(n = sum(value)) %>%
+  mutate(lab = paste0(year, "\n (n = ", n,")"))
+
+fruit_drop_data_short %>%
+  mutate(n_mature = total_fruit - n_dropped) %>%
+  rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
+  pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
+  add_row(year = factor(2021), name = "Flower", value = 0) %>%
+  group_by(year) %>%
+  ggplot(aes(y = value, x = year, fill = name)) +
+  geom_col(position = "fill") +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) +
+  ylab("Proportion") +
+  xlab("Year") +
+  theme_classic(base_size = 10) +
+  scale_x_discrete(breaks = ylabs_fruits$year, labels = ylabs_fruits$lab) +
+  theme(legend.title = element_blank(),
+        panel.grid.major.y = element_line(linewidth = .1,
+                                          colour = "black")) -> p6
+
+p5+p6 + plot_annotation(tag_levels = "a")
+
+ggsave(here::here("output","figures","year_comp_bar.png"),
+       width = 1800, height = 900, units = "px")
+
+# boxplots ----------------------------------------------------------------
 
 fruit_set_data %>%
   rename(Flower = n_flowers, `Immature fruit` = n_immature_fruits) %>%
@@ -286,14 +363,6 @@ fruit_set_data %>%
         panel.grid.major.y = element_line(linewidth = .1,
                                           colour = "black")) -> p3
 
-ylabs_fd <- fruit_drop_data_short %>%
-  mutate(n_mature = total_fruit - n_dropped) %>%
-  rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
-  pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
-  mutate(name = as.factor(name)) %>%
-  group_by(name, year) %>%
-  summarise(n = n()) %>%
-  mutate(lab = paste0(year, "\n (n = ", round(n / 2),")"))
 
 fruit_drop_data_short %>%
   mutate(n_mature = total_fruit - n_dropped) %>%

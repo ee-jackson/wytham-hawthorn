@@ -38,10 +38,10 @@ plot_mcmc_check <- function(model) {
 
 mcmc_plot_list <- lapply(model_list, plot_mcmc_check)
 
-wrap_plots(mcmc_plot_list, ncol = 2)
+wrap_plots(mcmc_plot_list, ncol = 1)
 
 ggsave(here::here("output","figures","mcmc_checks.png"),
-       width = 1961, height = 1500, units = "px")
+       width = 1500, height = 1700, units = "px")
 
 
 # Posterior predictive checks ---------------------------------------------
@@ -62,61 +62,49 @@ get_table <- function(model) {
                                  centrality = "median",
                                  test = FALSE) %>%
     mutate(across(!Rhat & !Parameter, round, 2)) %>%
+    mutate(across(Parameter, str_replace,
+                  'connectivity', 'conspecific_density')) %>%
     gt()
 }
 
 
-# Plot for fruit drop -----------------------------------------------------
-
-drop_r_t <- get_table(model_list$fruit_drop_repro_fit.rds)
-gtsave(drop_r_t, here::here("output", "results", "fruit_drop_repro.png"))
-drop_r_t_png <- png::readPNG(here::here("output", "results", "fruit_drop_repro.png"),
-                         native = TRUE)
-
-drop_r_pp <- plot_pp_check(model_list$fruit_drop_repro_fit.rds)
-
-drop_n_t <- get_table(model_list$fruit_drop_non_fit.rds)
-gtsave(drop_n_t, here::here("output", "results", "fruit_drop_non.png"))
-drop_n_t_png <- png::readPNG(here::here("output", "results", "fruit_drop_non.png"),
-                         native = TRUE)
-
-drop_n_pp <- plot_pp_check(model_list$fruit_drop_non_fit.rds)
-
-((drop_r_pp / drop_r_t_png) | (drop_n_pp / drop_n_t_png)) +
-  plot_annotation(tag_levels = 'a') &
-  theme(plot.tag = element_text(size = 20))
-
-png(
-  here::here("output", "figures", "fruit_drop_si.png"),
-  width = 1000,
-  height = 500,
-  units = "px"
-)
-
-
 # Plot for fruit set ------------------------------------------------------
 
-set_r_t <- get_table(model_list$fruit_set_repro_fit.rds)
-gtsave(set_r_t, here::here("output", "results", "fruit_set_repro.png"))
-set_r_t_png <- png::readPNG(here::here("output", "results", "fruit_set_repro.png"),
-                           native = TRUE)
+set_t <- get_table(model_list$fruit_set_fit.rds)
+gtsave(set_t, here::here("output", "results", "fruit_set.png"))
+set_t_png <- png::readPNG(here::here("output", "results", "fruit_set.png"),
+                          native = TRUE)
 
-set_r_pp <- plot_pp_check(model_list$fruit_set_repro_fit.rds)
+set_pp <- plot_pp_check(model_list$fruit_set_fit.rds)
 
-set_n_t <- get_table(model_list$fruit_set_non_fit.rds)
-gtsave(set_n_t, here::here("output", "results", "fruit_set_non.png"))
-set_n_t_png <- png::readPNG(here::here("output", "results", "fruit_set_non.png"),
-                           native = TRUE)
-
-set_n_pp <- plot_pp_check(model_list$fruit_set_non_fit.rds)
-
-((set_r_pp / set_r_t_png) | (set_n_pp / set_n_t_png)) +
+(set_pp / set_t_png) +
   plot_annotation(tag_levels = 'a') &
   theme(plot.tag = element_text(size = 20))
 
 png(
   here::here("output", "figures", "fruit_set_si.png"),
-  width = 1000,
+  width = 500,
+  height = 500,
+  units = "px"
+)
+
+
+# Plot for fruit drop -----------------------------------------------------
+
+drop_t <- get_table(model_list$fruit_drop_fit.rds)
+gtsave(drop_t, here::here("output", "results", "fruit_drop.png"))
+drop_t_png <- png::readPNG(here::here("output", "results", "fruit_drop.png"),
+                         native = TRUE)
+
+drop_pp <- plot_pp_check(model_list$fruit_drop_fit.rds)
+
+(drop_pp / drop_t_png) +
+  plot_annotation(tag_levels = 'a') &
+  theme(plot.tag = element_text(size = 20))
+
+png(
+  here::here("output", "figures", "fruit_drop_si.png"),
+  width = 500,
   height = 500,
   units = "px"
 )
@@ -124,27 +112,20 @@ png(
 
 # Plot for short fruit drop -----------------------------------------------
 
-drops_r_t <- get_table(model_list$fruit_drop_short_repro_fit.rds)
-gtsave(drops_r_t, here::here("output", "results", "fruit_drop_short_repro.png"))
-drops_r_t_png <- png::readPNG(here::here("output", "results", "fruit_drop_short_repro.png"),
+drops_t <- get_table(model_list$fruit_drop_short_fit.rds)
+gtsave(drops_t, here::here("output", "results", "fruit_drop_short.png"))
+drops_t_png <- png::readPNG(here::here("output", "results", "fruit_drop_short.png"),
                             native = TRUE)
 
-drops_r_pp <- plot_pp_check(model_list$fruit_drop_short_repro_fit.rds)
+drops_pp <- plot_pp_check(model_list$fruit_drop_short_fit.rds)
 
-drops_n_t <- get_table(model_list$fruit_drop_short_non_fit.rds)
-gtsave(drops_n_t, here::here("output", "results", "fruit_drop_short_non.png"))
-drops_n_t_png <- png::readPNG(here::here("output", "results", "fruit_drop_short_non.png"),
-                            native = TRUE)
-
-drops_n_pp <- plot_pp_check(model_list$fruit_drop_short_non_fit.rds)
-
-((drops_r_pp / drops_r_t_png) | (drops_n_pp / drops_n_t_png)) +
+(drops_pp / drops_t_png) +
   plot_annotation(tag_levels = 'a') &
   theme(plot.tag = element_text(size = 20))
 
 png(
   here::here("output", "figures", "fruit_drop_short_si.png"),
-  width = 1000,
+  width = 500,
   height = 500,
   units = "px"
 )
