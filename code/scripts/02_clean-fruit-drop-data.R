@@ -59,30 +59,30 @@ fruit_counts_21_22 %>%
 
 # summarise ---------------------------------------------------------------
 
+# mature to dispersal
 survey_data_21_22 %>%
   filter(exclusion == TRUE) %>%
-  select(- branch) %>%
-  group_by(branch_id) %>%
-  reframe(across(c(tree_id, exclusion, length_cm)),
-            total_fruit = max(n_fruit),
-          min_fruit = min(n_fruit)) %>%
-  distinct() %>%
-  mutate(n_dropped = total_fruit - min_fruit) %>%
-  select(-min_fruit) -> summary_fruit_long
+  filter(survey == 4 | survey == 1) %>%
+  pivot_wider(id_cols = c(branch_id, tree_id, exclusion, length_cm),
+              names_from = survey,
+              values_from = n_fruit) %>%
+  mutate(n_dropped = `1` - `4`) %>%
+  select(-`4`) %>%
+  rename(total_fruit = `1`) %>%
+  mutate(n_dropped =
+           ifelse(n_dropped < 0, 0, n_dropped)) -> summary_fruit_late
 
+# dispersal - bagged v non-bagged
 survey_data_21_22 %>%
-  filter(survey == 1 | survey == 3) %>%
-  filter(branch == "a" | branch == "b" | branch == "c") %>%
-  select(-exclusion, -length_cm, -date, - branch) %>%
-  group_by(branch_id) %>%
-  reframe(across(tree_id),
-          total_fruit = max(n_fruit),
-          min_fruit = min(n_fruit)) %>%
-  distinct() %>%
-  mutate(n_dropped = total_fruit - min_fruit) %>%
-  select(-min_fruit) %>%
-  mutate(year = as.factor(2021)) %>%
-  bind_rows(fruit_counts_22_23)  -> summary_fruit_short
+  filter(survey == 4 | survey == 8) %>%
+  pivot_wider(id_cols = c(branch_id, tree_id, exclusion, length_cm),
+              names_from = survey,
+              values_from = n_fruit) %>%
+  mutate(n_dropped = `4` - `8`) %>%
+  select(-`8`) %>%
+  rename(total_fruit = `4`) %>%
+  mutate(n_dropped =
+           ifelse(n_dropped < 0, 0, n_dropped)) -> summary_fruit_dispersal
 
 
 # add dbh -----------------------------------------------------------------
@@ -92,30 +92,47 @@ readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   mutate(plot = as.numeric(plot)) %>%
   select(plot, dbh) %>%
   distinct() %>%
-  inner_join(summary_fruit_long, by = c("plot" = "tree_id"),
+  inner_join(fruit_counts_22_23, by = c("plot" = "tree_id"),
              multiple = "all") %>%
-  rename(tree_id = plot) -> summary_fruit_dbh
+  rename(tree_id = plot) -> summary_fruit_early_dbh
 
 readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
   filter(tree_id == "tree_0") %>%
   mutate(plot = as.numeric(plot)) %>%
   select(plot, dbh) %>%
   distinct() %>%
-  inner_join(summary_fruit_short, by = c("plot" = "tree_id"),
+  inner_join(summary_fruit_late, by = c("plot" = "tree_id"),
              multiple = "all") %>%
-  rename(tree_id = plot) -> summary_fruit_short_dbh
+  rename(tree_id = plot) -> summary_fruit_late_dbh
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(plot = as.numeric(plot)) %>%
+  select(plot, dbh) %>%
+  distinct() %>%
+  inner_join(summary_fruit_dispersal, by = c("plot" = "tree_id"),
+             multiple = "all") %>%
+  rename(tree_id = plot) -> summary_fruit_dispersal_dbh
 
 
 # add connectivity and save -----------------------------------------------
 
 readRDS(here::here("data", "clean", "connectivity_data.rds")) %>%
-  inner_join(summary_fruit_dbh, by = c("plot" = "tree_id"),
+  inner_join(summary_fruit_late_dbh, by = c("plot" = "tree_id"),
              multiple = "all") %>%
   rename(tree_id = plot) %>%
-  saveRDS(here::here("data", "clean", "fruit_drop_data.rds"))
+  mutate(year = as.factor(2021)) %>%
+  saveRDS(here::here("data", "clean", "fruit_drop_late.rds"))
 
 readRDS(here::here("data", "clean", "connectivity_data.rds")) %>%
-  inner_join(summary_fruit_short_dbh, by = c("plot" = "tree_id"),
+  inner_join(summary_fruit_early_dbh, by = c("plot" = "tree_id"),
              multiple = "all") %>%
   rename(tree_id = plot) %>%
-  saveRDS(here::here("data", "clean", "fruit_drop_data_short.rds"))
+  saveRDS(here::here("data", "clean", "fruit_drop_early.rds"))
+
+readRDS(here::here("data", "clean", "connectivity_data.rds")) %>%
+  inner_join(summary_fruit_dispersal_dbh, by = c("plot" = "tree_id"),
+             multiple = "all") %>%
+  rename(tree_id = plot) %>%
+  mutate(year = as.factor(2021)) %>%
+  saveRDS(here::here("data", "clean", "fruit_dispersal.rds"))

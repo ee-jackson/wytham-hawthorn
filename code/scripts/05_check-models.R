@@ -26,22 +26,29 @@ model_list <- lapply(file_names, readRDS)
 
 names(model_list) <- lapply(file_names, basename)
 
+# re-order list
+model_list <- model_list[c("fruit_set_fit.rds",
+                           "early_drop_fit.rds",
+                           "late_drop_fit.rds",
+                           "dispersal_fit.rds")]
 
 # MCMC diagnostics --------------------------------------------------------
 
-plot_mcmc_check <- function(model) {
+plot_mcmc_check <- function(model, title) {
   mcmc_trace(model, regex_pars = "b_",
              iter1 = 1000) +
-    ggtitle(str_wrap(formula(model), 70)) +
+    ggtitle(title) +
     theme_classic(base_size = 5)
 }
 
-mcmc_plot_list <- lapply(model_list, plot_mcmc_check)
+mcmc_plot_list <- map2(.x = model_list,
+                       .y = names(model_list),
+                       .f = plot_mcmc_check)
 
 wrap_plots(mcmc_plot_list, ncol = 1)
 
 ggsave(here::here("output","figures","mcmc_checks.png"),
-       width = 1500, height = 1700, units = "px")
+       width = 1500, height = 2000, units = "px")
 
 
 # Posterior predictive checks ---------------------------------------------
@@ -89,42 +96,64 @@ png(
 )
 
 
-# Plot for fruit drop -----------------------------------------------------
+# early fruit drop --------------------------------------------------------
 
-drop_t <- get_table(model_list$fruit_drop_fit.rds)
-gtsave(drop_t, here::here("output", "results", "fruit_drop.png"))
-drop_t_png <- png::readPNG(here::here("output", "results", "fruit_drop.png"),
+drop_t <- get_table(model_list$early_drop_fit.rds)
+gtsave(drop_t, here::here("output", "results", "early_fruit_drop.png"))
+drop_t_png <- png::readPNG(here::here("output", "results", "early_fruit_drop.png"),
                          native = TRUE)
 
-drop_pp <- plot_pp_check(model_list$fruit_drop_fit.rds)
+drop_pp <- plot_pp_check(model_list$early_drop_fit.rds)
 
 (drop_pp / drop_t_png) +
   plot_annotation(tag_levels = 'a') &
   theme(plot.tag = element_text(size = 20))
 
 png(
-  here::here("output", "figures", "fruit_drop_si.png"),
+  here::here("output", "figures", "early_fruit_drop_si.png"),
   width = 500,
   height = 500,
   units = "px"
 )
 
 
-# Plot for short fruit drop -----------------------------------------------
 
-drops_t <- get_table(model_list$fruit_drop_short_fit.rds)
-gtsave(drops_t, here::here("output", "results", "fruit_drop_short.png"))
-drops_t_png <- png::readPNG(here::here("output", "results", "fruit_drop_short.png"),
+# late fruit drop ---------------------------------------------------------
+
+drops_t <- get_table(model_list$late_drop_fit.rds)
+gtsave(drops_t, here::here("output", "results", "late_fruit_drop.png"))
+drops_t_png <- png::readPNG(here::here("output", "results", "late_fruit_drop.png"),
                             native = TRUE)
 
-drops_pp <- plot_pp_check(model_list$fruit_drop_short_fit.rds)
+drops_pp <- plot_pp_check(model_list$late_drop_fit.rds)
 
 (drops_pp / drops_t_png) +
   plot_annotation(tag_levels = 'a') &
   theme(plot.tag = element_text(size = 20))
 
 png(
-  here::here("output", "figures", "fruit_drop_short_si.png"),
+  here::here("output", "figures", "late_fruit_drop_si.png"),
+  width = 500,
+  height = 500,
+  units = "px"
+)
+
+
+# dispersal ---------------------------------------------------------------
+
+disp <- get_table(model_list$dispersal_fit.rds)
+gtsave(disp, here::here("output", "results", "dispersal.png"))
+disp_png <- png::readPNG(here::here("output", "results", "dispersal.png"),
+                            native = TRUE)
+
+disp_pp <- plot_pp_check(model_list$dispersal_fit.rds)
+
+(disp_pp / disp_png) +
+  plot_annotation(tag_levels = 'a') &
+  theme(plot.tag = element_text(size = 20))
+
+png(
+  here::here("output", "figures", "dispersal_si.png"),
   width = 500,
   height = 500,
   units = "px"
