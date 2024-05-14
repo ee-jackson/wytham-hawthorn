@@ -18,7 +18,7 @@ library("modelr")
 
 # global parameters -------------------------------------------------------
 
-font_size <- 20
+font_size <- 23
 pal <- viridisLite::viridis(n = 3, begin = 0.2, end = 0.8, option = "mako")
 names(pal) <- c("2021", "2022", "2023")
 dens_col <- viridisLite::viridis(n = 1, begin = 0.9, end = 1, option = "mako")
@@ -95,7 +95,7 @@ tidybayes::tidy_draws(fruit_set_mod) %>%
     ), .95))),
     fill_type = "gradient",
     stroke = 2,
-    size = 15,
+    size = 12,
     linewidth = 10,
     shape = 21,
     point_fill = "white", slab_fill = dens_col,
@@ -105,7 +105,7 @@ tidybayes::tidy_draws(fruit_set_mod) %>%
   geom_vline(xintercept = 0,
              linetype = 2,
              linewidth = 1) +
-  labs(x = "Possible parameter values", y = "") +
+  labs(x = "Parameter value", y = "") +
   theme(
     legend.position = "none",
     plot.margin = margin(
@@ -116,8 +116,7 @@ tidybayes::tidy_draws(fruit_set_mod) %>%
       "in"
     ),
     axis.text.y = element_text(colour = "black")
-  ) +
-  labs(tag = "a") -> pa
+  ) -> pa
 
 # panel b -----------------------------------------------------------------
 
@@ -127,7 +126,7 @@ fruit_set_pred |>
   ggdist::stat_lineribbon(
     aes(y = .epred / n_flowers, fill_ramp = after_stat(.width)),
     .width = ppoints(40) ) |> adjust(aes(partition = year)) |> blend("multiply") +
-  ggdist::scale_fill_ramp_continuous(range = c(0.80, 0), guide = "none") +
+  ggdist::scale_fill_ramp_continuous(range = c(0.8, 0), guide = "none") +
   geom_point(data = fruit_set_data,
              aes(
                x = repro_connectivity,
@@ -146,10 +145,9 @@ fruit_set_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Reproductive conspecific density") +
-  ylab("Proportion of flowers turning to fruits") +
-  labs(tag = "b") -> pb
+  ylab("Fruit set") -> pb
 
 # panel c -----------------------------------------------------------------
 
@@ -178,10 +176,9 @@ fruit_set_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Non-reproductive conspecific density") +
-  ylab("Proportion of flowers turning to fruits") +
-  labs(tag = "c") -> pc
+  ylab("Fruit set") -> pc
 
 # panel d -----------------------------------------------------------------
 
@@ -210,10 +207,9 @@ fruit_set_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Diameter at breast height /mm") +
-  ylab("Proportion of flowers turning to fruits") +
-  labs(tag = "d") -> pd
+  ylab("Fruit set") -> pd
 
 # fruit drop early --------------------------------------------------------
 
@@ -282,7 +278,7 @@ tidybayes::tidy_draws(early_drop_mod) %>%
     ), .95))),
     fill_type = "gradient",
     stroke = 2,
-    size = 15,
+    size = 12,
     linewidth = 10,
     shape = 21,
     point_fill = "white",
@@ -293,7 +289,7 @@ tidybayes::tidy_draws(early_drop_mod) %>%
   geom_vline(xintercept = 0,
              linetype = 2,
              linewidth = 1) +
-  labs(x = "Possible parameter values", y = "") +
+  labs(x = "Parameter value", y = "") +
   theme(
     legend.position = "none",
     plot.margin = margin(
@@ -304,8 +300,7 @@ tidybayes::tidy_draws(early_drop_mod) %>%
       "in"
     ),
     axis.text.y = element_text(colour = "black")
-  ) +
-  labs(tag = "e") -> pe
+  ) -> pe
 
 
 # panel f -----------------------------------------------------------------
@@ -334,10 +329,9 @@ early_drop_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Reproductive conspecific density") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "f") -> pf
+  ylab("Early fruit drop") -> pf
 
 # panel g -----------------------------------------------------------------
 
@@ -365,10 +359,9 @@ early_drop_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Non-reproductive conspecific density") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "g") -> pg
+  ylab("Early fruit drop") -> pg
 
 # panel h -----------------------------------------------------------------
 
@@ -397,13 +390,12 @@ early_drop_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Diameter at breast height /mm") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "h") -> ph
+  ylab("Early fruit drop") -> ph
 
 
-# fruit drop long ---------------------------------------------------------
+# fruit drop late ---------------------------------------------------------
 
 readRDS(here::here("data", "clean", "fruit_drop_late.rds")) %>%
   mutate(repro_connectivity_sc = scale(repro_connectivity),
@@ -471,7 +463,7 @@ tidybayes::tidy_draws(late_drop_mod) %>%
     ), .95))),
     fill_type = "gradient",
     stroke = 2,
-    size = 15,
+    size = 12,
     linewidth = 10,
     shape = 21,
     point_fill = "white",
@@ -482,7 +474,7 @@ tidybayes::tidy_draws(late_drop_mod) %>%
   geom_vline(xintercept = 0,
              linetype = 2,
              linewidth = 1) +
-  labs(x = "Possible parameter values", y = "") +
+  labs(x = "Parameter value", y = "") +
   theme(
     legend.position = "none",
     plot.margin = margin(
@@ -493,8 +485,7 @@ tidybayes::tidy_draws(late_drop_mod) %>%
       "in"
     ),
     axis.text.y = element_text(colour = "black")
-  ) +
-  labs(tag = "i") -> pi
+  ) -> pi
 
 
 # panel j -----------------------------------------------------------------
@@ -523,10 +514,9 @@ late_drop_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Reproductive conspecific density") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "j") -> pj
+  ylab("Late fruit drop") -> pj
 
 # panel k -----------------------------------------------------------------
 
@@ -554,10 +544,9 @@ late_drop_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Non-reproductive conspecific density") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "k") -> pk
+  ylab("Late fruit drop") -> pk
 
 # panel l -----------------------------------------------------------------
 
@@ -585,41 +574,9 @@ late_drop_pred |>
                     limits = c("2021", "2022", "2023")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Diameter at breast height /mm") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "l") -> pl
-
-# Combine -----------------------------------------------------------------
-
-layout <- "
-AAA
-DEF
-GHI
-JKL
-"
-
-wrap_elements(full = (pa + pe + pi)) +
-  pb + pf + pj +
-  pc + pg + pk +
-  pd + ph + pl +
-  plot_layout(design = layout,
-              guides = "collect") &
-  theme(legend.text = element_text(size = 20),
-        legend.title = element_text(size = 25),
-        legend.position = "bottom") -> test
-
-
-png(
-  here::here("output", "figures", "model_preds.png"),
-  width = 1476,
-  height = 1800,
-  units = "px",
-  type = "cairo"
-)
-test
-dev.off()
-
+  ylab("Late fruit drop") -> pl
 
 # dispersal ---------------------------------------------------------------
 
@@ -670,10 +627,10 @@ tidybayes::tidy_draws(disp_mod) %>%
     `Diameter at\nbreast height` = b_dbh_sc,
     `Reproductive\nconspecific density` = b_repro_connectivity_sc,
     `Non-reproductive\nconspecific density` = b_non_repro_connectivity_sc,
-    `Exclusion` = `b_exclusionTRUE`
+    `Vertebrate\nexclusion` = `b_exclusionTRUE`
   ) %>%
   select(
-    `Exclusion`,
+    `Vertebrate\nexclusion`,
     `Reproductive\nconspecific density`,
     `Non-reproductive\nconspecific density`,
     `Diameter at\nbreast height`
@@ -683,7 +640,7 @@ tidybayes::tidy_draws(disp_mod) %>%
              y = factor(
                parameter,
                levels = c(
-                 "Exclusion",
+                 "Vertebrate\nexclusion",
                  "Diameter at\nbreast height",
                  "Non-reproductive\nconspecific density",
                  "Reproductive\nconspecific density"
@@ -695,7 +652,7 @@ tidybayes::tidy_draws(disp_mod) %>%
     ), .95))),
     fill_type = "gradient",
     stroke = 2,
-    size = 15,
+    size = 12,
     linewidth = 10,
     shape = 21,
     point_fill = "white",
@@ -706,7 +663,7 @@ tidybayes::tidy_draws(disp_mod) %>%
   geom_vline(xintercept = 0,
              linetype = 2,
              linewidth = 1) +
-  labs(x = "Possible parameter values", y = "") +
+  labs(x = "Parameter value", y = "") +
   theme(
     legend.position = "none",
     plot.margin = margin(
@@ -717,8 +674,7 @@ tidybayes::tidy_draws(disp_mod) %>%
       "in"
     ),
     axis.text.y = element_text(colour = "black")
-  ) +
-  labs(tag = "m") -> pm
+  ) -> pm
 
 
 # panel n -----------------------------------------------------------------
@@ -752,20 +708,24 @@ disp_pred |>
   scale_linetype_manual(values = c(`FALSE` = "solid", `TRUE` = "dotted")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Reproductive conspecific density") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "n") +
+  ylab("Dispersal") +
   guides(size = "none",
-         shape = guide_legend(title = "Vertebrate exclusion", override.aes = list(colour = "#382A54FF", size = 3, alpha = 1)),
-         linetype = guide_legend(title = " ",override.aes = list(colour = "#382A54FF")) )  -> pn
+         colour = "none",
+         shape = guide_legend(title = "Vertebrate exclusion",
+                              override.aes = list(colour = "#382A54FF",
+                                                  size = 3, alpha = 1)),
+         linetype = guide_legend(title = " ",
+                                 override.aes = list(colour = "#382A54FF")) )  -> pn
 
 
 # panel o -----------------------------------------------------------------
 
 disp_pred |>
   group_by(exclusion) %>%
-  ggplot(aes(x = non_repro_connectivity_us,  fill = year, color = year)) +
+  ggplot(aes(x = non_repro_connectivity_us,  fill = year, color = year,
+             linetype = exclusion, shape = exclusion)) +
   ggdist::stat_lineribbon(
     aes(y = .epred / total_fruit, linetype = exclusion,
         fill_ramp = after_stat(.width)),
@@ -776,12 +736,11 @@ disp_pred |>
                x = non_repro_connectivity,
                y = n_dropped / total_fruit,
                size = total_fruit,
-               colour = year
+               colour = year,
+               shape = exclusion
              ),
-             show.legend = FALSE,
              inherit.aes = FALSE,
-             alpha = 0.8,
-             shape = 16
+             alpha = 0.8
   ) +
   scale_colour_manual(values = pal,
                       limits = c("2021", "2022", "2023")) +
@@ -791,19 +750,23 @@ disp_pred |>
   scale_linetype_manual(values = c(`FALSE` = "solid", `TRUE` = "dotted")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Non-reproductive conspecific density") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "k") +
+  ylab("Dispersal") +
   guides(size = "none",
-         shape = guide_legend(title = "Vertebrate exclusion", override.aes = list(colour = "#382A54FF", size = 3, alpha = 1)),
-         linetype = guide_legend(title = " ",override.aes = list(colour = "#382A54FF")) ) -> po
+         colour = "none",
+         shape = guide_legend(title = "Vertebrate exclusion",
+                              override.aes = list(colour = "#382A54FF",
+                                                  size = 3, alpha = 1)),
+         linetype = guide_legend(title = " ",
+                                 override.aes = list(colour = "#382A54FF")) ) -> po
 
 # panel p -----------------------------------------------------------------
 
 disp_pred |>
   group_by(exclusion) %>%
-  ggplot(aes(x = dbh_us,  fill = year, color = year)) +
+  ggplot(aes(x = dbh_us,  fill = year, color = year,
+             linetype = exclusion, shape = exclusion)) +
   ggdist::stat_lineribbon(
     aes(y = .epred / total_fruit, linetype = exclusion,
         fill_ramp = after_stat(.width)),
@@ -814,12 +777,11 @@ disp_pred |>
                x = dbh,
                y = n_dropped / total_fruit,
                size = total_fruit,
-               colour = year
+               colour = year,
+               shape = exclusion
              ),
-             show.legend = FALSE,
              inherit.aes = FALSE,
-             alpha = 0.8,
-             shape = 16
+             alpha = 0.8
   ) +
   scale_colour_manual(values = pal,
                       limits = c("2021", "2022", "2023")) +
@@ -829,32 +791,81 @@ disp_pred |>
   scale_linetype_manual(values = c(`FALSE` = "solid", `TRUE` = "dotted")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
-  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Diameter at breast height /mm") +
-  ylab("Proportion of fruits dropped") +
-  labs(tag = "p") +
+  ylab("Dispersal") +
   guides(size = "none",
-         shape = guide_legend(title = "Vertebrate exclusion", override.aes = list(colour = "#382A54FF", size = 3, alpha = 1)),
-         linetype = guide_legend(title = " ",override.aes = list(colour = "#382A54FF")) ) -> pp
+         colour = "none",
+         shape = guide_legend(title = "Vertebrate exclusion",
+                              override.aes = list(colour = "#382A54FF", size = 3, alpha = 1)),
+         linetype = guide_legend(title = " ",
+                                 override.aes = list(colour = "#382A54FF")) ) -> pp
 
 
-wrap_elements(pm +
-  pn +
-  po +
-  pp) +
-  plot_layout(
-              guides = "collect") &
+# calendar ----------------------------------------------------------------
+
+survey_segs <- tibble(
+  year = factor(c(2022, 2023, 2023, 2021, 2021)),
+  start = as.Date(c("2023-05-09", "2023-05-31", "2023-06-30", "2023-08-05",
+                    "2023-10-30"), format = "%Y-%m-%d"),
+  end = as.Date(c("2023-06-17", "2023-06-29", "2023-09-29", "2023-10-29",
+                  "2024-03-07"), format = "%Y-%m-%d"),
+  type = factor(c("Fruit set", " Fruit set", "Early fruit drop", "Late fruit drop",
+                  "Dispersal"))
+)
+
+ggplot(survey_segs,
+       aes(x = start, xend = end,
+           y = reorder(type, start, decreasing = TRUE), yend = type,
+           colour = year, group = type)) +
+  geom_segment(linewidth = 5, lineend = "round") +
+  scale_x_date(date_breaks = "1 month",  expand = c(0,0),
+               date_labels = "%b",
+               limits = as.Date(c("2023-05-01", "2024-03-10"))) +
+  scale_color_manual(values = pal) +
+  theme_classic(base_size = font_size) +
+  theme(panel.grid.major.y = element_line(linetype = 2),
+        axis.text.y = element_text(colour = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank()) +
+  guides(linetype = "none", colour = "none") -> cal
+
+
+# combine -----------------------------------------------------------------
+
+layout2 <- "
+AAAA
+BCDE
+BCDE
+FGHI
+FGHI
+JKLM
+JKLM
+NOPQ
+NOPQ
+"
+
+
+free(cal) +
+  patchwork::free(pa) + free(pe) + free(pi) + free(pm) +
+  pb + pf + pj + pn +
+  pc + pg + pk + po +
+  pd + ph + pl + pp +
+  plot_layout(design = layout2,
+              guides = "collect",
+              axis_titles = "collect") +
+  patchwork::plot_annotation(tag_levels = "a") &
   theme(legend.text = element_text(size = 20),
         legend.title = element_text(size = 25),
-        legend.position = "bottom") -> test
+        legend.position = "bottom") -> test_full
 
 
 png(
-  here::here("output", "figures", "test.png"),
-  width = 1476,
+  here::here("output", "figures", "model_preds.png"),
+  width = 1800,
   height = 1800,
   units = "px",
   type = "cairo"
 )
-test
+test_full
 dev.off()
