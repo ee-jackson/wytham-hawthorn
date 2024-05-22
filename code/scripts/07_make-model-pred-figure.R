@@ -432,7 +432,8 @@ late_drop_data %>%
       attr(late_drop_data$dbh_sc, 'scaled:scale') +
       attr(late_drop_data$dbh_sc, 'scaled:center')
   ) %>%
-  mutate(year = ordered("2021")) -> late_drop_pred
+  mutate(year = ordered("2021"),
+         exclusion = as.factor("TRUE")) -> late_drop_pred
 
 # panel i -----------------------------------------------------------------
 
@@ -491,9 +492,14 @@ tidybayes::tidy_draws(late_drop_mod) %>%
 # panel j -----------------------------------------------------------------
 
 late_drop_pred |>
-  ggplot(aes(x = repro_connectivity_us,  fill = year, color = year)) +
+  ggplot(aes(x = repro_connectivity_us,
+             fill = year,
+             color = year,
+             linetype = exclusion,
+             shape = exclusion)) +
   ggdist::stat_lineribbon(
-    aes(y = .epred / total_fruit, fill_ramp = after_stat(.width)),
+    aes(y = .epred / total_fruit,
+        fill_ramp = after_stat(.width)),
     .width = ppoints(40) ) +
   ggdist::scale_fill_ramp_continuous(range = c(0.8, 0), guide = "none") +
   geom_point(data = late_drop_data,
@@ -501,29 +507,41 @@ late_drop_pred |>
                x = repro_connectivity,
                y = n_dropped / total_fruit,
                size = total_fruit,
-               colour = year
+               colour = year,
+               shape = exclusion
              ),
              show.legend = FALSE,
              inherit.aes = FALSE,
-             alpha = 0.8,
-             shape = 16
+             alpha = 0.8
   ) +
   scale_colour_manual(values = pal,
                       limits = c("2021", "2022", "2023")) +
   scale_fill_manual(values = pal,
                     limits = c("2021", "2022", "2023")) +
+  scale_shape_manual(values = c(`TRUE` = 17, `FALSE` = 16)) +
+  scale_linetype_manual(values = c(`FALSE` = "solid", `TRUE` = "dotted")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Reproductive conspecific density") +
-  ylab("Late fruit drop") -> pj
+  ylab("Late fruit drop") +
+  guides(shape = guide_legend(title = "Vertebrate exclusion",
+                              override.aes = list(colour = "#382A54FF",
+                                                  size = 3, alpha = 1)),
+         linetype = guide_legend(title = " ",
+                                 override.aes = list(colour = "#382A54FF"))) -> pj
 
 # panel k -----------------------------------------------------------------
 
 late_drop_pred |>
-  ggplot(aes(x = non_repro_connectivity_us,  fill = year, color = year)) +
+  ggplot(aes(x = non_repro_connectivity_us,
+             fill = year,
+             color = year,
+             linetype = exclusion,
+             shape = exclusion)) +
   ggdist::stat_lineribbon(
-    aes(y = .epred / total_fruit, fill_ramp = after_stat(.width)),
+    aes(y = .epred / total_fruit,
+        fill_ramp = after_stat(.width)),
     .width = ppoints(40) ) +
   ggdist::scale_fill_ramp_continuous(range = c(0.8, 0), guide = "none") +
   geom_point(data = late_drop_data,
@@ -531,29 +549,42 @@ late_drop_pred |>
                x = non_repro_connectivity,
                y = n_dropped / total_fruit,
                size = total_fruit,
+               shape = exclusion,
                colour = year
              ),
              show.legend = FALSE,
              inherit.aes = FALSE,
-             alpha = 0.8,
-             shape = 16
+             alpha = 0.8
   ) +
   scale_colour_manual(values = pal,
                       limits = c("2021", "2022", "2023")) +
   scale_fill_manual(values = pal,
                     limits = c("2021", "2022", "2023")) +
+  scale_shape_manual(values = c(`TRUE` = 17, `FALSE` = 16)) +
+  scale_linetype_manual(values = c(`FALSE` = "solid", `TRUE` = "dotted")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Non-reproductive conspecific density") +
-  ylab("Late fruit drop") -> pk
+  ylab("Late fruit drop") +
+  guides(shape = guide_legend(title = "Vertebrate exclusion",
+                              override.aes = list(colour = "#382A54FF",
+                                                  size = 3, alpha = 1)),
+         linetype = guide_legend(title = " ",
+                                 override.aes = list(colour = "#382A54FF"))) -> pk
 
 # panel l -----------------------------------------------------------------
 
 late_drop_pred |>
-  ggplot(aes(x = dbh_us,  fill = year, color = year)) +
+  ggplot(aes(x = dbh_us,
+             fill = year,
+             color = year,
+             linetype = exclusion,
+             shape = exclusion)) +
   ggdist::stat_lineribbon(
-    aes(y = .epred / total_fruit, fill_ramp = after_stat(.width)),
+    aes(y = .epred / total_fruit,
+        linetype = exclusion,
+        fill_ramp = after_stat(.width)),
     .width = ppoints(40) ) +
   ggdist::scale_fill_ramp_continuous(range = c(0.8, 0), guide = "none") +
   geom_point(data = late_drop_data,
@@ -561,22 +592,29 @@ late_drop_pred |>
                x = dbh,
                y = n_dropped / total_fruit,
                size = total_fruit,
-               colour = year
+               colour = year,
+               shape = exclusion
              ),
              show.legend = FALSE,
              inherit.aes = FALSE,
-             alpha = 0.8,
-             shape = 16
+             alpha = 0.8
   ) +
   scale_colour_manual(values = pal,
                       limits = c("2021", "2022", "2023")) +
   scale_fill_manual(values = pal,
                     limits = c("2021", "2022", "2023")) +
+  scale_shape_manual(values = c(`TRUE` = 17, `FALSE` = 16)) +
+  scale_linetype_manual(values = c(`FALSE` = "solid", `TRUE` = "dotted")) +
   theme_classic(base_size = font_size) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Diameter at breast height /mm") +
-  ylab("Late fruit drop") -> pl
+  ylab("Late fruit drop") +
+  guides(shape = guide_legend(title = "Vertebrate exclusion",
+                              override.aes = list(colour = "#382A54FF",
+                                                  size = 3, alpha = 1)),
+         linetype = guide_legend(title = " ",
+                                 override.aes = list(colour = "#382A54FF"))) -> pl
 
 # dispersal ---------------------------------------------------------------
 
@@ -861,7 +899,7 @@ free(cal) +
 
 
 png(
-  here::here("output", "figures", "model_preds.png"),
+  here::here("output", "figures", "model_preds2.png"),
   width = 1800,
   height = 1800,
   units = "px",
