@@ -40,14 +40,6 @@ readRDS(here::here("data", "clean", "fruit_drop_late.rds")) %>%
          tree_id = as.factor(tree_id)
   ) -> late_drop_data
 
-readRDS(here::here("data", "clean", "fruit_dispersal.rds")) %>%
-  mutate(repro_connectivity_sc = scale(repro_connectivity),
-         non_repro_connectivity_sc = scale(non_repro_connectivity),
-         dbh_sc = scale(dbh),
-         tree_id = as.factor(tree_id),
-         year = as.factor(year),
-         exclusion = as.factor(exclusion)
-  ) -> dispersal_data
 
 # Prior -------------------------------------------------------------------
 
@@ -147,36 +139,3 @@ bayestestR::describe_posterior(
     "late_drop_describe_posterior.csv"
   ))
 
-
-# dispersal ---------------------------------------------------------------
-
-dispersal_mod <-
-  brm(data = dispersal_data,
-      family = binomial(link = logit),
-      n_dropped | trials(total_fruit) ~
-        exclusion +
-        repro_connectivity_sc +
-        non_repro_connectivity_sc +
-        dbh_sc + (1|tree_id),
-      prior = bprior,
-      iter = 2000,
-      warmup = 1000,
-      chains = 4,
-      cores = 4,
-      seed = 9,
-      file = (here::here("output", "models", "dispersal_fit.rds")))
-
-summary(dispersal_mod)
-
-bayestestR::describe_posterior(
-  dispersal_mod,
-  ci = 0.95,
-  ci_method = "HDI",
-  centrality = "median"
-) %>%
-  as.data.frame() %>%
-  write_csv(here::here(
-    "output",
-    "results",
-    "dispersal_describe_posterior.csv"
-  ))

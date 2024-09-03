@@ -29,8 +29,8 @@ names(model_list) <- lapply(file_names, basename)
 # re-order list
 model_list <- model_list[c("fruit_set_fit.rds",
                            "early_drop_fit.rds",
-                           "late_drop_fit.rds",
-                           "dispersal_fit.rds")]
+                           "late_drop_fit.rds")]
+
 
 # MCMC diagnostics --------------------------------------------------------
 
@@ -117,7 +117,6 @@ png(
 )
 
 
-
 # late fruit drop ---------------------------------------------------------
 
 drops_t <- get_table(model_list$late_drop_fit.rds)
@@ -138,23 +137,3 @@ png(
   units = "px"
 )
 
-
-# dispersal ---------------------------------------------------------------
-
-disp <- get_table(model_list$dispersal_fit.rds)
-gtsave(disp, here::here("output", "results", "dispersal.png"))
-disp_png <- png::readPNG(here::here("output", "results", "dispersal.png"),
-                            native = TRUE)
-
-disp_pp <- plot_pp_check(model_list$dispersal_fit.rds)
-
-(disp_pp / disp_png) +
-  plot_annotation(tag_levels = 'a') &
-  theme(plot.tag = element_text(size = 20))
-
-png(
-  here::here("output", "figures", "dispersal_si.png"),
-  width = 500,
-  height = 500,
-  units = "px"
-)
