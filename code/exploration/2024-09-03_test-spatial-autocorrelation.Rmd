@@ -1,0 +1,121 @@
+---
+title: "Test for spatial autocorrelation UPDATE"
+author: "Eleanor Jackson"
+date: '09 February, 2023'
+always_allow_html: true
+output: 
+  github_document:
+    keep_html: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(fig.path = "figures/2024-09-03_test-spatial-autocorrelation/")
+```
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
+  filter(year == "2022") %>% 
+  mutate(fruit_set = n_immature_fruits / n_flowers) %>% 
+  group_by(tree_id) %>% 
+  summarise(fruit_set = median(fruit_set, na.rm = TRUE)) -> fruit_set_data_2022
+
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
+  filter(year == "2023")  %>% 
+  mutate(fruit_set = n_immature_fruits / n_flowers) %>% 
+  group_by(tree_id) %>% 
+  summarise(fruit_set = median(fruit_set, na.rm = TRUE)) -> fruit_set_data_2023
+
+readRDS(here::here("data", "clean", "fruit_drop_early.rds")) %>% 
+  mutate(fruit_drop = n_dropped / total_fruit) %>% 
+  group_by(tree_id) %>% 
+  summarise(fruit_drop = median(fruit_drop, na.rm = TRUE)) -> early_drop_data
+
+readRDS(here::here("data", "clean", "fruit_drop_late.rds"))%>% 
+  mutate(fruit_drop = n_dropped / total_fruit) %>% 
+  group_by(tree_id) %>% 
+  summarise(fruit_drop = median(fruit_drop, na.rm = TRUE)) -> late_drop_data
+```
+
+
+```{r variogram-fruit-set-2022}
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(tree_id = as.numeric(plot)) %>% 
+  inner_join(fruit_set_data_2022, by = c("tree_id" = "tree_id"))  ->
+  fruit_set_trees_2022
+  
+sp::coordinates(fruit_set_trees_2022) = ~latitude+longitude
+
+plot(
+    gstat::variogram(fruit_set ~ 1, data = fruit_set_trees_2022), 
+    xlab = "distance / km", main = "Fruit set, 2022"
+) -> p1
+```
+
+```{r variogram-fruit-set-2023}
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(tree_id = as.numeric(plot)) %>% 
+  inner_join(fruit_set_data_2023, by = c("tree_id" = "tree_id"))  ->
+  fruit_set_trees_2023
+  
+sp::coordinates(fruit_set_trees_2023) = ~latitude+longitude
+
+plot(
+    gstat::variogram(fruit_set ~ 1, data = fruit_set_trees_2023), 
+    xlab = "distance / km", main = "Fruit set, 2023"
+) -> p2
+```
+
+```{r variogram-fruit-drop-early}
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(tree_id = as.numeric(plot)) %>% 
+  inner_join(early_drop_data, by = c("tree_id" = "tree_id"))  ->
+  early_drop_data_trees
+  
+sp::coordinates(early_drop_data_trees) = ~latitude+longitude
+
+plot(
+    gstat::variogram(fruit_drop ~ 1, data = early_drop_data_trees), 
+    xlab = "distance / km", main = "Early fruit drop, 2023"
+) -> p3
+```
+
+```{r variogram-fruit-drop-late}
+
+readRDS(here::here("data", "clean", "hawthorn_plots.rds")) %>%
+  select(plot, tree_id, longitude, latitude, dbh, reproductive) %>%
+  filter(tree_id == "tree_0") %>%
+  mutate(tree_id = as.numeric(plot)) %>% 
+  inner_join(late_drop_data, by = c("tree_id" = "tree_id"))  ->
+  late_drop_data_trees
+  
+sp::coordinates(late_drop_data_trees) = ~latitude+longitude
+
+plot(
+    gstat::variogram(fruit_drop ~ 1, data = late_drop_data_trees), 
+    xlab = "distance / km", main = "Late fruit drop, 2021"
+) -> p4
+
+```
+
+```{r variogram-both, fig.height=4.5, fig.width=10.5}
+grid.arrange(p1, p2, p3, p4, nrow = 2)
+
+png(
+  here::here("output", "figures", "variograms2.png"),
+  width = 800,
+  height = 500,
+  units = "px"
+)
+grid.arrange(p1, p2, p3, p4, nrow = 2)
+dev.off()
+
+```
