@@ -987,32 +987,8 @@
     },
     "ggmap": {
       "Package": "ggmap",
-      "Version": "3.0.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "RgoogleMaps",
-        "bitops",
-        "cli",
-        "digest",
-        "dplyr",
-        "ggplot2",
-        "glue",
-        "grid",
-        "httr",
-        "jpeg",
-        "magrittr",
-        "plyr",
-        "png",
-        "purrr",
-        "rlang",
-        "scales",
-        "stringr",
-        "tibble",
-        "tidyr"
-      ],
-      "Hash": "c883525d360469c2f324102ae5aecd33"
+      "Version": "4.0.0",
+      "Source": "Repository"
     },
     "ggplot2": {
       "Package": "ggplot2",

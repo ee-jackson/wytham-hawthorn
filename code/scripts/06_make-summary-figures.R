@@ -20,7 +20,7 @@ library("patchwork")
 
 # Summarise data ----------------------------------------------------------
 
-readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+readRDS(here::here("data", "clean", "fruit_drop_late.rds")) %>%
   filter(exclusion == TRUE) %>%
   drop_na() %>%
   group_by(tree_id) %>%
@@ -127,11 +127,11 @@ readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   select(tree_id, connectivity, dbh) %>%
   unique() -> fruit_set_trees
 
-readRDS(here::here("data", "clean", "fruit_drop_data.rds")) %>%
+readRDS(here::here("data", "clean", "fruit_drop_late.rds")) %>%
   select(tree_id, connectivity, dbh) %>%
   unique() -> fruit_drop_trees
 
-readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
+readRDS(here::here("data", "clean", "fruit_drop_early.rds")) %>%
   select(tree_id, connectivity, dbh) %>%
   unique() -> fruit_drop_short_trees
 
@@ -177,8 +177,8 @@ wytham_basemap <- ggmap::get_map(bbox, zoom = 17,
 ggmap(wytham_basemap) +
   geom_point(aes(x = longitude, y = latitude,
                  colour = connectivity, size = dbh),
-             data = mapping_data, alpha = 0.7, shape = 16) +
-  scale_colour_viridis_c(option = "D") +
+             data = mapping_data, alpha = 0.8, shape = 16) +
+  scale_colour_viridis_c(option = "F", direction = -1) +
   ggsn::scalebar(gg_data,
                  location = "bottomright",
                  dist = 250,
@@ -233,11 +233,11 @@ ggsave(here::here("output","figures","map.png"),
 
 # compare years -----------------------------------------------------------
 
-readRDS(here::here("data", "clean", "fruit_drop_data_short.rds")) %>%
+readRDS(here::here("data", "clean", "fruit_drop_early.rds")) %>%
   mutate(
          tree_id = as.factor(tree_id),
          year = as.factor(year)
-  ) -> fruit_drop_data_short
+  ) -> fruit_drop_data_early
 
 readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
   mutate(
@@ -253,7 +253,7 @@ ylabs_fs <- fruit_set_data %>%
   summarise(n = n()) %>%
   mutate(lab = paste0(year, "\n (n = ", n / 2,")"))
 
-ylabs_fd <- fruit_drop_data_short %>%
+ylabs_fd <- fruit_drop_data_early %>%
   mutate(n_mature = total_fruit - n_dropped) %>%
   rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
   pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
@@ -280,7 +280,7 @@ fruit_set_data %>%
                                           colour = "black")) -> p1
 
 
-fruit_drop_data_short %>%
+fruit_drop_data_early %>%
   mutate(n_mature = total_fruit - n_dropped) %>%
   group_by(year) %>%
   summarise(median_mature = median(n_mature),
@@ -332,7 +332,7 @@ fruit_set_data %>%
         panel.grid.major.y = element_line(linewidth = .1,
                                           colour = "black")) -> p5
 
-ylabs_fruits <- fruit_drop_data_short %>%
+ylabs_fruits <- fruit_drop_data_early %>%
   mutate(n_mature = total_fruit - n_dropped) %>%
   rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
   pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
@@ -342,7 +342,7 @@ ylabs_fruits <- fruit_drop_data_short %>%
   summarise(n = sum(value)) %>%
   mutate(lab = paste0(year, "\n (n = ", n,")"))
 
-fruit_drop_data_short %>%
+fruit_drop_data_early %>%
   mutate(n_mature = total_fruit - n_dropped) %>%
   rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
   pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
@@ -386,7 +386,7 @@ fruit_set_data %>%
                                           colour = "black")) -> p3
 
 
-fruit_drop_data_short %>%
+fruit_drop_data_early %>%
   mutate(n_mature = total_fruit - n_dropped) %>%
   rename(`Mature fruit` = n_mature, `Immature fruit` = total_fruit) %>%
   pivot_longer(cols = c(`Mature fruit`, `Immature fruit`)) %>%
