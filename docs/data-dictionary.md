@@ -24,6 +24,84 @@ This folder is located at `data/raw/hawthorn-mapping` and contains a `.csv` file
 |:---------|:------------|
 | `notes` | Any notes taken during data collection |
 
+## fruit_set_flowers.csv
+Count of flowers on focal trees in 2022
+
+| variable | description |
+|:---------|:------------|
+| `tree_id` | The focal tree id number |
+| `date` | The date the data was collected |
+| `phenology_whole_tr` |  A note on the phenology of the tree, either `no flowers`, `majority flowers closed` or `majority flowers open` |
+| `branch_id` | The branch id |
+| `n_flowers` | A count of flowers on the branch (including damaged flowers) | 
+| `n_flowers_damaged` | A count of damaged flowers (i.e. herbivore damage) |
+| `bagged` | Did the branch have a pollinator exclusion mesh over it at the time of data collection? |
+| `branch_length_cm` | Only recorded once for each branch - the length of the branch in cm from it's tip to the ID tag |
+| `notes` | Any notes taken during data collection |
+
+## fruit_set_initial.csv 
+Count of green fruits on focal trees in 2022
+
+| variable | description |
+|:---------|:------------|
+| `tree_id` | The focal tree id number |
+| `date` | The date the data was collected |
+| `branch_id` | The branch id |
+| `n_fruits` | A count of fruits on the branch | 
+| `bagged` | Did the branch have a pollinator exclusion mesh over it at the time of data collection? |
+| `notes` | Any notes taken during data collection |
+
+## fruit_set_final.csv
+Count of red fruits on focal trees in 2022
+
+| variable | description |
+|:---------|:------------|
+| `tree_id` | The focal tree id number |
+| `date` | The date the data was collected |
+| `branch_id` | The branch id |
+| `n_fruits` | A count of fruits on the branch | 
+| `notes` | Any notes taken during data collection |
+
+## fruit_set_2023.csv
+Flower and immature fruit counts in 2023.
+Flowers were counted on 31st May 2023 and immature fruits were counted on 26th and 29th June 2023.
+
+| variable | description |
+|:---------|:------------|
+| `tree_id` | The focal tree id number |
+| `branch_id` | The branch id |
+| `n_immature_fruits` | A count of immature fruits on the branch | 
+| `n_flowers` | A count of flowers on the branch (not including damaged or galled flowers) | 
+| `n_damaged_flowers` | A count of damaged flowers (i.e. herbivore damage) |
+| `n_galled_flowers` | A count of galled flowers (closed flowers with apparent herbivore emergence/entrance hole) |
+| `notes` | Any notes taken during data collection |
+
+## fruit_drop_data.csv
+Monthly fruit counts between 2021-08-05 and 2022-03-07
+
+| variable | description |
+|:---------|:------------|
+| `date` | The date the data was collected |
+| `tree_id` | The focal tree id number |
+| `branch_id` | The branch id |
+| `n_fruit` | A count of fruits on the branch | 
+| `length_cm` | Only recorded once for each branch - the length of the branch in cm from it's tip to the ID tag |
+| `notes` | Any notes taken during data collection |
+
+## flower_and_fruit_counts_hawthorn_2023.xlsx
+Fruit and flower counts in 2023. This is an excel workbook where sheet 1 contains the data and sheet 2 contains metadata.
+
+| variable | description |
+|:---------|:------------|
+| `tree_id` | The focal tree id number |
+| `branch_id` | The branch id |
+| `n_flowers` | A count of flowers on the branch (not including damaged or galled flowers) | 
+| `n_damaged_flowers` | A count of damaged flowers (i.e. herbivore damage) |
+| `n_galled_flowers` | A count of galled flowers (closed flowers with apparent herbivore emergence/entrance hole) |
+| `n_immature_fruits` | A count of immature fruits on the branch | 
+| `n_mature_fruits` | A count of mature fruits on the branch | 
+| `notes` | Any notes taken during data collection |
+
 ## hawthorn-herbivory.csv
 
 | variable | description |
