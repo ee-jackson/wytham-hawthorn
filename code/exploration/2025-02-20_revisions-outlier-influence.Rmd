@@ -1,0 +1,222 @@
+---
+title: "Response to reviewer #1, comment #2"
+author: '`r Sys.getenv("USER")`'
+date: '`r format(Sys.time(), "%d %B, %Y")`' 
+always_allow_html: true
+output: 
+  github_document:
+    keep_html: true
+---
+	
+```{r setup, include = FALSE}
+file_name <- rstudioapi::getSourceEditorContext()$path
+
+knitr::opts_chunk$set(
+  fig.path =
+    paste0("figures/", sub("\\.Rmd$", "", basename(file_name)), "/", sep = "")
+)
+
+ggplot2::theme_set(ggplot2::theme_classic(base_size = 10))
+```
+
+
+```{r}
+library("tidyverse")
+library("here")
+library("brms")
+library("bayestestR")
+library("tidybayes")
+library("ggdist")
+library("ggblend")
+library("patchwork")
+library("viridisLite")
+library("modelr")
+
+set.seed(123)
+options(brms.file_refit = "on_change")
+```
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
+  mutate(repro_connectivity_sqrt = sqrt(repro_connectivity),
+         non_repro_connectivity_sqrt = sqrt(non_repro_connectivity)) %>% 
+  mutate(repro_connectivity_sc = scale(sqrt(repro_connectivity)),
+         non_repro_connectivity_sc = scale(sqrt(non_repro_connectivity)),
+         dbh_sc = scale(dbh),
+         tree_id = as.factor(tree_id),
+         year = as.factor(year)
+  ) -> fruit_set_data
+
+readRDS(here::here("data", "clean", "fruit_drop_early.rds")) %>%
+  mutate(repro_connectivity_sqrt = sqrt(repro_connectivity),
+         non_repro_connectivity_sqrt = sqrt(non_repro_connectivity)) %>% 
+  mutate(repro_connectivity_sc = scale(sqrt(repro_connectivity)),
+         non_repro_connectivity_sc = scale(sqrt(non_repro_connectivity)),
+         dbh_sc = scale(dbh),
+         tree_id = as.factor(tree_id)
+           ) -> early_drop_data
+
+readRDS(here::here("data", "clean", "fruit_drop_late.rds")) %>%
+  mutate(repro_connectivity_sqrt = sqrt(repro_connectivity),
+         non_repro_connectivity_sqrt = sqrt(non_repro_connectivity)) %>% 
+  mutate(repro_connectivity_sc = scale(sqrt(repro_connectivity)),
+         non_repro_connectivity_sc = scale(sqrt(non_repro_connectivity)),
+         dbh_sc = scale(dbh),
+         tree_id = as.factor(tree_id)
+  ) -> late_drop_data
+
+```
+
+```{r}
+fruit_set_data %>% 
+  ggplot(aes(x = non_repro_connectivity, y = n_immature_fruits/n_flowers)) +
+  geom_point() +
+  geom_smooth(se=FALSE, method = "glm") +
+  
+  fruit_set_data %>% 
+  ggplot(aes(x = sqrt(non_repro_connectivity), y = n_immature_fruits/n_flowers)) +
+  geom_point() +
+  geom_smooth(se=FALSE, method = "glm") +
+  
+  fruit_set_data %>% 
+  ggplot(aes(x = scale(non_repro_connectivity), y = n_immature_fruits/n_flowers)) +
+  geom_point() +
+  geom_smooth(se=FALSE, method = "glm") +
+
+  fruit_set_data %>% 
+  ggplot(aes(x = scale(sqrt(non_repro_connectivity)), y = n_immature_fruits/n_flowers)) +
+  geom_point() +
+  geom_smooth(se=FALSE, method = "glm")
+
+```
+
+```{r}
+file_names <- as.list(dir(path = here::here("output", "models"),
+                          pattern = "*.rds", full.names = TRUE))
+
+model_list <- lapply(file_names, readRDS)
+
+names(model_list) <- lapply(file_names, basename)
+```
+
+```{r}
+plot(loo(model_list$fruit_set_fit.rds))
+
+plot(loo(model_list$early_drop_fit.rds))
+
+plot(loo(model_list$late_drop_fit.rds))
+```
+
+```{r}
+bprior <- c(prior(normal(0, 1), class = b))
+```
+
+```{r}
+fruit_set_mod_sqrt <-
+  brm(data = fruit_set_data,
+      family = binomial(link = logit),
+      n_immature_fruits | trials(n_flowers) ~
+        repro_connectivity_sc +
+        non_repro_connectivity_sc +
+        dbh_sc + year + (1|tree_id),
+      prior = bprior,
+      iter = 2000,
+      warmup = 1000,
+      chains = 4,
+      cores = 4,
+      seed = 9,
+      file = (here::here(
+        "code",
+        "exploration", 
+        "figures",
+        "2025-02-20_revisions-outlier-influence", 
+        "fruit_set_fit_sqrt.rds")))
+
+summary(fruit_set_mod_sqrt)
+```
+
+```{r}
+early_drop_mod_sqrt <-
+  brm(data = early_drop_data,
+      family = binomial(link = logit),
+      n_dropped | trials(total_fruit) ~
+        repro_connectivity_sc +
+        non_repro_connectivity_sc +
+        dbh_sc + (1|tree_id),
+      prior = bprior,
+      iter = 2000,
+      warmup = 1000,
+      chains = 4,
+      cores = 4,
+      seed = 9,
+      file = (here::here(
+        "code",
+        "exploration", 
+        "figures",
+        "2025-02-20_revisions-outlier-influence", 
+        "early_drop_fit_sqrt.rds")))
+
+summary(early_drop_mod_sqrt)
+```
+
+
+```{r}
+late_drop_mod_sqrt <-
+  brm(data = late_drop_data,
+      family = binomial(link = logit),
+      n_dropped | trials(total_fruit) ~
+        repro_connectivity_sc +
+        non_repro_connectivity_sc +
+        dbh_sc + (1|tree_id),
+      prior = bprior,
+      iter = 2000,
+      warmup = 1000,
+      chains = 4,
+      cores = 4,
+      seed = 9,
+      file = (here::here("code",
+        "exploration", 
+        "figures",
+        "2025-02-20_revisions-outlier-influence", 
+        "late_drop_fit_sqrt.rds")))
+
+summary(late_drop_mod_sqrt)
+```
+
+```{r}
+fruit_set_sqrt <- as_draws_df(fruit_set_mod_sqrt)
+fruit_set <- as_draws_df(model_list$fruit_set_fit.rds)
+
+early_drop_sqrt <- as_draws_df(early_drop_mod_sqrt)
+early_drop <- as_draws_df(model_list$early_drop_fit.rds)
+
+late_drop_sqrt <- as_draws_df(late_drop_mod_sqrt)
+late_drop <- as_draws_df(model_list$late_drop_fit.rds)
+
+draws <-
+  bind_rows(
+    list(
+      "Fruit set_sqrt" = fruit_set_sqrt,
+      "Fruit set_no transform" = fruit_set,
+      "Early fruit drop_sqrt" = early_drop_sqrt,
+      "Early fruit drop_no transform" = early_drop,
+      "Late fruit drop_sqrt" = late_drop_sqrt,
+      "Late fruit drop_no transform" = late_drop),
+    .id = "Model"
+  ) %>% 
+  separate_wider_delim(Model, 
+                       delim = "_", 
+                       names = c("response var", "transform")) %>% 
+  pivot_longer(cols = c(b_Intercept,
+                        b_repro_connectivity_sc,
+                        b_non_repro_connectivity_sc,
+                        b_dbh_sc),
+               names_to = "parameter")
+
+draws %>% 
+  ggplot(aes(x = value, y = parameter)) +
+  stat_halfeye() +
+  facet_grid(`response var`~transform) +
+  geom_vline(xintercept = 0, colour = "red", linetype = 2)
+```
+
