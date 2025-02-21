@@ -1,0 +1,325 @@
+---
+title: "Response to reviewer #1, comment #1"
+author: '`r Sys.getenv("USER")`'
+date: '`r format(Sys.time(), "%d %B, %Y")`' 
+always_allow_html: true
+output: 
+  github_document:
+    keep_html: true
+---
+	
+```{r setup, include = FALSE}
+file_name <- rstudioapi::getSourceEditorContext()$path
+
+knitr::opts_chunk$set(
+  fig.path =
+    paste0("figures/", sub("\\.Rmd$", "", basename(file_name)), "/", sep = "")
+)
+
+ggplot2::theme_set(ggplot2::theme_classic(base_size = 10))
+```
+
+> It is not clear if the variable ‘non-reproductive conspecific density’ (first mentioned lines 164-167) refers to total conspecific density (i.e., reproductive + non-reproductive) or non-reproductive conspecific only. This first sentence makes me think that it is total density (“density… including non-reproductive conspecific individuals”), but the data presented in Figure 2 show that the values for non-reproductive density are lower than reproductive density (i.e., max ~12,000 vs ~26,000) and so the variable must be non-reproductive conspecific only (i.e., total – (minus) reproductive). These definitions should be clarified, but it also leads me to wonder why non-reproductive density was assessed rather than total density. As presented in Figure A2, non-reproductive density has no clear relationship to reproductive density and therefore tells us little about total density which is the likely mechanism of non-pollination resource competition (e.g., soil nutrients, soil moisture, light). Looking at the data presented in Figure A2, the two highest non-reproductive density values (top of graph ~10,000 and 11,500) correspond to vastly different reproductive density values (i.e., ~0 and 26,000). The total density values for these data points are therefore approximately 10,000 and 37,500, respectively, which is a very large difference compared to the non-reproductive densities of ~10,000 and 11,500, respectively. My concern is that total density is not captured in this analysis but could have large impacts on the reproductive attributes measured in this study. Hopefully the authors can clarify if my interpretation is correct and consider if an analysis using total density rather than non-reproductive only is more appropriate. 
+
+```{r}
+library("tidyverse")
+library("here")
+library("brms")
+library("bayestestR")
+library("tidybayes")
+library("ggdist")
+library("ggblend")
+library("patchwork")
+library("viridisLite")
+library("modelr")
+
+options(brms.file_refit = "on_change")
+```
+
+```{r}
+readRDS(here::here("data", "clean", "fruit_set_data.rds")) %>%
+  mutate(repro_connectivity_sc = scale(repro_connectivity),
+         connectivity_sc = scale(connectivity),
+         dbh_sc = scale(dbh),
+         tree_id = as.factor(tree_id),
+         year = as.factor(year)
+  ) -> fruit_set_data
+
+readRDS(here::here("data", "clean", "fruit_drop_early.rds")) %>%
+  mutate(repro_connectivity_sc = scale(repro_connectivity),
+         connectivity_sc = scale(connectivity),
+         dbh_sc = scale(dbh),
+         tree_id = as.factor(tree_id)
+           ) -> early_drop_data
+
+readRDS(here::here("data", "clean", "fruit_drop_late.rds")) %>%
+  mutate(repro_connectivity_sc = scale(repro_connectivity),
+         connectivity_sc = scale(connectivity),
+         dbh_sc = scale(dbh),
+         tree_id = as.factor(tree_id)
+  ) -> late_drop_data
+
+bprior <- c(prior(normal(0, 1), class = b))
+```
+
+```{r}
+fruit_set_mod <-
+  brm(data = fruit_set_data,
+      family = binomial(link = logit),
+      n_immature_fruits | trials(n_flowers) ~
+        repro_connectivity_sc +
+        connectivity_sc +
+        dbh_sc + year + (1|tree_id),
+      prior = bprior,
+      iter = 2000,
+      warmup = 1000,
+      chains = 4,
+      cores = 4,
+      seed = 9,
+      file = (here::here(
+        "code",
+        "exploration", 
+        "figures",
+        "2025-02-20_revisions-total-connectivity", 
+        "fruit_set_fit.rds")))
+
+summary(fruit_set_mod)
+
+```
+
+```{r}
+early_drop_mod <-
+  brm(data = early_drop_data,
+      family = binomial(link = logit),
+      n_dropped | trials(total_fruit) ~
+        repro_connectivity_sc +
+        connectivity_sc +
+        dbh_sc + (1|tree_id),
+      prior = bprior,
+      iter = 2000,
+      warmup = 1000,
+      chains = 4,
+      cores = 4,
+      seed = 9,
+      file = (here::here("code",
+        "exploration", 
+        "figures",
+        "2025-02-20_revisions-total-connectivity",
+        "early_drop_fit.rds")))
+
+summary(early_drop_mod)
+```
+
+
+```{r}
+late_drop_mod <-
+  brm(data = late_drop_data,
+      family = binomial(link = logit),
+      n_dropped | trials(total_fruit) ~
+        repro_connectivity_sc +
+        connectivity_sc +
+        dbh_sc + (1|tree_id),
+      prior = bprior,
+      iter = 2000,
+      warmup = 1000,
+      chains = 4,
+      cores = 4,
+      seed = 9,
+      file = (here::here("code",
+        "exploration", 
+        "figures",
+        "2025-02-20_revisions-total-connectivity",
+        "late_drop_fit.rds")))
+
+summary(late_drop_mod)
+```
+
+```{r}
+font_size <- 23
+pal <- viridisLite::viridis(n = 3, begin = 0.2, end = 0.8, option = "mako")
+names(pal) <- c("2021", "2022", "2023")
+dens_col <- "lightgrey"
+```
+
+
+```{r}
+tidybayes::tidy_draws(fruit_set_mod) %>%
+  rename(
+    `Diameter at\nbreast height` = b_dbh_sc,
+    `Reproductive\nconspecific density` = b_repro_connectivity_sc,
+    `Total\nconspecific density` = b_connectivity_sc,
+    `Year` = `b_year2023`
+  ) %>%
+  select(
+    `Reproductive\nconspecific density`,
+    `Total\nconspecific density`,
+    `Diameter at\nbreast height`,
+    `Year`
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "parameter") %>%
+  ggplot(aes(x = value,
+             y = factor(
+               parameter,
+               levels = c(
+                 "Year",
+                 "Diameter at\nbreast height",
+                 "Total\nconspecific density",
+                 "Reproductive\nconspecific density"
+               )
+             ))) +
+  ggdist::stat_halfeye(
+    aes(slab_alpha = after_stat(-pmax(abs(
+      1 - 2 * cdf
+    ), .95))),
+    fill_type = "gradient",
+    stroke = 2,
+    size = 12,
+    linewidth = 10,
+    shape = 21,
+    point_fill = "white", slab_fill = dens_col,
+  ) +
+  scale_slab_alpha_continuous(guide = "none") +
+  theme_classic(base_size = font_size) +
+  geom_vline(xintercept = 0,
+             linetype = 2,
+             linewidth = 1) +
+  labs(x = "Parameter value", y = "") +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(
+      t = 0.1,
+      r = 0.7,
+      b = 0.1,
+      l = 0,
+      "in"
+    ),
+    axis.text.y = element_text(colour = "black")
+  ) -> pa
+```
+
+```{r}
+tidybayes::tidy_draws(early_drop_mod) %>%
+  rename(
+    `Diameter at\nbreast height` = b_dbh_sc,
+    `Reproductive\nconspecific density` = b_repro_connectivity_sc,
+    `Total\nconspecific density` = b_connectivity_sc
+  ) %>%
+  select(
+    `Reproductive\nconspecific density`,
+    `Total\nconspecific density`,
+    `Diameter at\nbreast height`
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "parameter") %>%
+  ggplot(aes(x = value,
+             y = factor(
+               parameter,
+               levels = c(
+                 "Diameter at\nbreast height",
+                 "Total\nconspecific density",
+                 "Reproductive\nconspecific density"
+               )
+             ))) +
+  ggdist::stat_halfeye(
+    aes(slab_alpha = after_stat(-pmax(abs(
+      1 - 2 * cdf
+    ), .95))),
+    fill_type = "gradient",
+    stroke = 2,
+    size = 12,
+    linewidth = 10,
+    shape = 21,
+    point_fill = "white",
+    slab_fill = dens_col,
+  ) +
+  scale_slab_alpha_continuous(guide = "none") +
+  theme_classic(base_size = font_size) +
+  geom_vline(xintercept = 0,
+             linetype = 2,
+             linewidth = 1) +
+  labs(x = "Parameter value", y = "") +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(
+      t = 0.1,
+      r = 0.7,
+      b = 0.1,
+      l = 0,
+      "in"
+    ),
+    axis.text.y = element_text(colour = "black")
+  ) -> pe
+```
+
+```{r}
+tidybayes::tidy_draws(late_drop_mod) %>%
+  rename(
+    `Diameter at\nbreast height` = b_dbh_sc,
+    `Reproductive\nconspecific density` = b_repro_connectivity_sc,
+    `Total\nconspecific density` = b_connectivity_sc
+  ) %>%
+  select(
+    `Reproductive\nconspecific density`,
+    `Total\nconspecific density`,
+    `Diameter at\nbreast height`
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "parameter") %>%
+  ggplot(aes(x = value,
+             y = factor(
+               parameter,
+               levels = c(
+                 "Diameter at\nbreast height",
+                 "Total\nconspecific density",
+                 "Reproductive\nconspecific density"
+               )
+             ))) +
+  ggdist::stat_halfeye(
+    aes(slab_alpha = after_stat(-pmax(abs(
+      1 - 2 * cdf
+    ), .95))),
+    fill_type = "gradient",
+    stroke = 2,
+    size = 12,
+    linewidth = 10,
+    shape = 21,
+    point_fill = "white",
+    slab_fill = dens_col,
+  ) +
+  scale_slab_alpha_continuous(guide = "none") +
+  theme_classic(base_size = font_size) +
+  geom_vline(xintercept = 0,
+             linetype = 2,
+             linewidth = 1) +
+  labs(x = "Parameter value", y = "") +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(
+      t = 0.1,
+      r = 0.7,
+      b = 0.1,
+      l = 0,
+      "in"
+    ),
+    axis.text.y = element_text(colour = "black")
+  ) -> pi
+```
+
+```{r}
+comb <- pa + pe + pi + 
+  patchwork::plot_annotation(tag_levels = "a") 
+
+
+png(
+  here::here("code", 
+             "exploration", 
+             "figures", 
+             "2025-02-20_revisions-total-connectivity",
+             "total-connectivity-posterior-draws.png"),
+  width = 1476,
+  height = 500,
+  units = "px",
+  type = "cairo"
+)
+comb
+dev.off()
+```
+
