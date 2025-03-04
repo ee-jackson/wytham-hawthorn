@@ -46,7 +46,7 @@ fruit_set_data %>%
     year = ordered(c(2022, 2023))
   ) %>%
   mutate(n_flowers = as.integer(n_flowers)) %>%
-  add_epred_draws(fruit_set_mod, ndraws = 500, re_formula = NA) %>%
+  add_epred_draws(fruit_set_mod, re_formula = NA) %>%
   mutate(
     non_repro_connectivity_us = non_repro_connectivity_sc *
       attr(fruit_set_data$non_repro_connectivity_sc, 'scaled:scale') +
@@ -241,7 +241,7 @@ early_drop_data %>%
   ) %>%
   mutate(total_fruit = as.integer(total_fruit),
          year = factor(2023)) %>%
-  add_epred_draws(early_drop_mod, ndraws = 500, re_formula = NA) %>%
+  add_epred_draws(early_drop_mod, re_formula = NA) %>%
   mutate(
     non_repro_connectivity_us = non_repro_connectivity_sc *
       attr(early_drop_data$non_repro_connectivity_sc, 'scaled:scale') +
@@ -434,7 +434,7 @@ late_drop_data %>%
   ) %>%
   mutate(total_fruit = as.integer(total_fruit),
          year = factor(2021)) %>%
-  add_epred_draws(late_drop_mod, ndraws = 500, re_formula = NA) %>%
+  add_epred_draws(late_drop_mod, re_formula = NA) %>%
   mutate(
     non_repro_connectivity_us = non_repro_connectivity_sc *
       attr(late_drop_data$non_repro_connectivity_sc, 'scaled:scale') +
@@ -679,7 +679,7 @@ patchwork::free(cal) +
 
 
 png(
-  here::here("output", "figures", "model_preds.png"),
+  here::here("output", "figures", "model_preds_new.png"),
   width = 1476,
   height = 1800,
   units = "px",
