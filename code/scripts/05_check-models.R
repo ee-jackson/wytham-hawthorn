@@ -62,6 +62,20 @@ plot_pp_check <- function(model) {
 
 # Get posterior param estimates -------------------------------------------
 
+names <-
+  c("Intercept",
+    "Reproductive conspecific density",
+    "Non-reproductive conspecific density",
+    "Diameter at breast height",
+    "Year")
+
+values <-
+  c("b_Intercept",
+    "b_repro_connectivity_sc",
+    "b_non_repro_connectivity_sc",
+    "b_dbh_sc",
+    "b_year2023")
+
 get_table <- function(model) {
   bayestestR::describe_posterior(model,
                                  ci = 0.95,
@@ -69,8 +83,7 @@ get_table <- function(model) {
                                  centrality = "median",
                                  test = FALSE) %>%
     mutate(across(!Rhat & !Parameter, round, 2)) %>%
-    mutate(across(Parameter, str_replace,
-                  'connectivity', 'conspecific_density')) %>%
+    mutate(Parameter = str_replace(Parameter, values, names)) %>%
     gt()
 }
 
@@ -97,6 +110,18 @@ png(
 
 
 # early fruit drop --------------------------------------------------------
+
+names <-
+  c("Intercept",
+    "Reproductive conspecific density",
+    "Non-reproductive conspecific density",
+    "Diameter at breast height")
+
+values <-
+  c("b_Intercept",
+    "b_repro_connectivity_sc",
+    "b_non_repro_connectivity_sc",
+    "b_dbh_sc")
 
 drop_t <- get_table(model_list$early_drop_fit.rds)
 gtsave(drop_t, here::here("output", "results", "early_fruit_drop.png"))
