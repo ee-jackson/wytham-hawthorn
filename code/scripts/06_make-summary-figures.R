@@ -230,6 +230,8 @@ wytham_map + inset_element(uk_map, left = 0.5, bottom = 0.5,
 ggsave(here::here("output","figures","map.png"),
        width = 1476, height = 1000, units = "px")
 
+ggsave(here::here("output","figures","figure_1.tiff"),
+       width = 1800, height = 1000, units = "px")
 
 # compare years -----------------------------------------------------------
 

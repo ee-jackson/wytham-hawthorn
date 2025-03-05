@@ -39,10 +39,10 @@ readRDS(here::here("output", "models",
 
 fruit_set_data %>%
   modelr::data_grid(
-    non_repro_connectivity_sc = modelr::seq_range(non_repro_connectivity_sc, n = 5),
-    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 5),
+    non_repro_connectivity_sc = modelr::seq_range(non_repro_connectivity_sc, n = 5, expand = 0.05),
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 5, expand = 0.05),
     n_flowers = modelr::seq_range(n_flowers, n = 5),
-    dbh_sc = modelr::seq_range(dbh_sc, n = 5),
+    dbh_sc = modelr::seq_range(dbh_sc, n = 5, expand = 0.05),
     year = ordered(c(2022, 2023))
   ) %>%
   mutate(n_flowers = as.integer(n_flowers)) %>%
@@ -145,7 +145,7 @@ fruit_set_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Reproductive conspecific density") +
   ylab("Fruit set") +
@@ -179,7 +179,7 @@ fruit_set_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Non-reproductive conspecific density") +
   ylab("Fruit set") +
@@ -213,7 +213,7 @@ fruit_set_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Diameter at breast height /mm") +
   ylab("Fruit set") +
@@ -234,10 +234,10 @@ readRDS(here::here("output", "models",
 
 early_drop_data %>%
   modelr::data_grid(
-    non_repro_connectivity_sc = modelr::seq_range(non_repro_connectivity_sc, n = 5),
-    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 5),
+    non_repro_connectivity_sc = modelr::seq_range(non_repro_connectivity_sc, n = 5, expand = 0.05),
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 5, expand = 0.05),
     total_fruit = modelr::seq_range(total_fruit, n = 5),
-    dbh_sc = modelr::seq_range(dbh_sc, n = 5)
+    dbh_sc = modelr::seq_range(dbh_sc, n = 5, expand = 0.05)
   ) %>%
   mutate(total_fruit = as.integer(total_fruit),
          year = factor(2023)) %>%
@@ -338,7 +338,7 @@ early_drop_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Reproductive conspecific density") +
   ylab("Early fruit drop") +
@@ -371,7 +371,7 @@ early_drop_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Non-reproductive conspecific density") +
   ylab("Early fruit drop") +
@@ -405,7 +405,7 @@ early_drop_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Diameter at breast height /mm") +
   ylab("Early fruit drop") +
@@ -427,10 +427,10 @@ readRDS(here::here("output", "models",
 
 late_drop_data %>%
   modelr::data_grid(
-    non_repro_connectivity_sc = modelr::seq_range(non_repro_connectivity_sc, n = 5),
-    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 5),
+    non_repro_connectivity_sc = modelr::seq_range(non_repro_connectivity_sc, n = 5, expand = 0.05),
+    repro_connectivity_sc = modelr::seq_range(repro_connectivity_sc, n = 5, expand = 0.05),
     total_fruit = modelr::seq_range(total_fruit, n = 5),
-    dbh_sc = modelr::seq_range(dbh_sc, n = 5)
+    dbh_sc = modelr::seq_range(dbh_sc, n = 5, expand = 0.05)
   ) %>%
   mutate(total_fruit = as.integer(total_fruit),
          year = factor(2021)) %>%
@@ -537,7 +537,7 @@ late_drop_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Reproductive conspecific density") +
   ylab("Late fruit drop") +
@@ -574,7 +574,7 @@ late_drop_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Non-reproductive conspecific density") +
   ylab("Late fruit drop") +
@@ -611,7 +611,7 @@ late_drop_pred |>
   scale_fill_manual(values = pal, drop = FALSE,
                     limits = names(pal)) +
   theme_classic(base_size = font_size) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0.005, 0.005)) +
   xlab("Diameter at breast height /mm") +
   ylab("Late fruit drop") +
@@ -677,11 +677,20 @@ patchwork::free(cal) +
         legend.position = "top",
         legend.justification = "left") -> test_full
 
-
 png(
-  here::here("output", "figures", "model_preds_new.png"),
+  here::here("output", "figures", "model_preds.png"),
   width = 1476,
   height = 1800,
+  units = "px",
+  type = "cairo"
+)
+test_full
+dev.off()
+
+tiff(
+  here::here("output", "figures", "figure_2.tiff"),
+  width = 1800,
+  height = 1900,
   units = "px",
   type = "cairo"
 )

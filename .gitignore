@@ -4,6 +4,8 @@ code/exploration/*.html
 
 photos/*
 
+*.tiff
+
 data/*
 !data/raw
 data/raw/*
