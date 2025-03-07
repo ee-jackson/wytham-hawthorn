@@ -1,7 +1,7 @@
 Response to reviewer \#1, comment \#1
 ================
 eleanorjackson
-21 February, 2025
+07 March, 2025
 
 > It is not clear if the variable ‘non-reproductive conspecific density’
 > (first mentioned lines 164-167) refers to total conspecific density
@@ -132,6 +132,48 @@ readRDS(here::here("data", "clean", "fruit_drop_late.rds")) %>%
 
 bprior <- c(prior(normal(0, 1), class = b))
 ```
+
+## plot correlation
+
+``` r
+readRDS(here::here("data", "clean", "connectivity_data.rds")) %>%
+  filter(plot %% 1 == 0) %>%  
+  ggplot(aes(x = repro_connectivity, y = non_repro_connectivity)) +
+  geom_point(shape = 16, alpha = 0.8) +
+  geom_smooth(method = "lm") +
+  labs(
+       x = "Reproductive conspecific density", 
+       y = "Non-reproductive conspecific density") +
+  theme_classic(base_size = 12) +
+  
+  readRDS(here::here("data", "clean", "connectivity_data.rds")) %>%
+  ggplot(aes(x = repro_connectivity, y = connectivity)) +
+  geom_point(shape = 16, alpha = 0.8) +
+  geom_smooth(method = "lm") +
+  labs(
+       x = "Reproductive conspecific density", 
+       y = "Total conspecific density") +
+  theme_classic(base_size = 12) +
+  
+  readRDS(here::here("data", "clean", "connectivity_data.rds")) %>%
+  ggplot(aes(x = non_repro_connectivity, y = connectivity)) +
+  geom_point(shape = 16, alpha = 0.8) +
+  geom_smooth(method = "lm") +
+  labs(
+       x = "Non-reproductive conspecific density", 
+       y = "Total conspecific density") +
+  theme_classic(base_size = 12) +
+  
+  plot_layout(ncol = 1)
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+    ## `geom_smooth()` using formula = 'y ~ x'
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](figures/2025-02-20_revisions-total-connectivity/unnamed-chunk-3-1.png)<!-- -->
+
+## Fit models with total connectivity + reproductive connectivity
 
 ``` r
 fruit_set_mod <-
