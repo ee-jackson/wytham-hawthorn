@@ -100,11 +100,12 @@ names(model_list) <- lapply(file_names, basename)
 ```
 
 ```{r}
-plot(loo(model_list$fruit_set_fit.rds))
+par(mfrow = c(2, 2), cex = 4)
 
-plot(loo(model_list$early_drop_fit.rds))
+plot(loo(model_list$fruit_set_fit.rds), main = "Fruit set")
+plot(loo(model_list$early_drop_fit.rds), main = "Early fruit drop")
+plot(loo(model_list$late_drop_fit.rds), main = "Late fruit drop")
 
-plot(loo(model_list$late_drop_fit.rds))
 ```
 
 ```{r}
