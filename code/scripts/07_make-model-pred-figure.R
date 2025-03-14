@@ -18,7 +18,7 @@ library("modelr")
 
 # global parameters -------------------------------------------------------
 
-font_size <- 23
+font_size <- 28
 pal <- viridisLite::viridis(n = 3, begin = 0.2, end = 0.8, option = "mako")
 names(pal) <- c("2021", "2022", "2023")
 dens_col <- "lightgrey"
@@ -115,8 +115,10 @@ tidybayes::tidy_draws(fruit_set_mod) %>%
       l = 0,
       "in"
     ),
-    axis.text.y = element_text(colour = "black")
-  ) -> pa
+    axis.text.y = element_text(colour = "black"),
+    plot.title = element_text(size = font_size)
+  ) +
+  ggtitle("Fruit set") -> pa
 
 # panel b -----------------------------------------------------------------
 
@@ -308,8 +310,10 @@ tidybayes::tidy_draws(early_drop_mod) %>%
       l = 0,
       "in"
     ),
-    axis.text.y = element_text(colour = "black")
-  ) -> pe
+    axis.text.y = element_text(colour = "black"),
+    plot.title = element_text(size = font_size)
+  ) +
+  ggtitle("Early fruit drop") -> pe
 
 
 # panel f -----------------------------------------------------------------
@@ -503,8 +507,10 @@ tidybayes::tidy_draws(late_drop_mod) %>%
       l = 0,
       "in"
     ),
-    axis.text.y = element_text(colour = "black")
-  ) -> pi
+    axis.text.y = element_text(colour = "black"),
+    plot.title = element_text(size = font_size)
+  ) +
+  ggtitle("Late fruit drop")-> pi
 
 
 # panel j -----------------------------------------------------------------
@@ -669,23 +675,12 @@ patchwork::free(cal) +
   pc + pg + pk +
   pd + ph + pl +
   plot_layout(design = layout2,
-              guides = "collect",
-              axis_titles = "collect") +
+              guides = "collect") +
   patchwork::plot_annotation(tag_levels = "a") &
-  theme(legend.text = element_text(size = 20),
-        legend.title = element_text(size = 25),
+  theme(legend.text = element_text(size = font_size - 1),
+        legend.title = element_text(size = font_size),
         legend.position = "top",
         legend.justification = "left") -> test_full
-
-png(
-  here::here("output", "figures", "model_preds.png"),
-  width = 1476,
-  height = 1800,
-  units = "px",
-  type = "cairo"
-)
-test_full
-dev.off()
 
 tiff(
   here::here("output", "figures", "figure_2.tiff"),
