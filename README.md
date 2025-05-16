@@ -4,7 +4,7 @@
 
 This repository contains the [research compendium](https://research-compendium.science) for the article:
 
-Jackson E.E., Greenwell M.P., Bullock J.M, Oliver T.H., Topple S., Foster C.W. & Gripenberg S. (2025). **Density-dependent effects on the reproductive ecology of trees in a temperate woodland.** *Ecology & Evolution.* DOI: [10.1002/ece3.71491](https://doi.org/10.1002/ece3.71491)
+Jackson E.E., Greenwell M.P., Bullock J.M., Oliver T.H., Topple S., Foster C.W. & Gripenberg S. (2025). **Density-dependent effects on the reproductive ecology of trees in a temperate woodland.** *Ecology & Evolution.* DOI: [10.1002/ece3.71491](https://doi.org/10.1002/ece3.71491)
 
 Contact: eleanor.elizabeth.j@gmail.com
 
