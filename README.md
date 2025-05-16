@@ -31,3 +31,6 @@ The [`docs/`](docs/) directory contains the [data dictionary](docs/data-dictiona
 
 ## Usage
 To reproduce results and figures from this project in the RStudio IDE, first open the `.Rproj` file and call `renv::restore()` to restore the project's R package library. Populate your `data/raw/` directory with the raw data files which can be downloaded from Zenodo [10.5281/zenodo.10599206](https://doi.org/10.5281/zenodo.10599206). Then, run the `.R` scripts in `code/scripts/` in the order in which they are labelled. 
+
+## License
+Code is under a [MIT license](LICENSE.md)
